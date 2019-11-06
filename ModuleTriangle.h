@@ -1,5 +1,5 @@
 #include "Module.h"
-#include "SDL/include/SDL.h"
+#include "SDL.h"
 #include "GL/glew.h"
 #include "MathGeoLib.h"
 

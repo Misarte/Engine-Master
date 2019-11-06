@@ -68,6 +68,7 @@ bool ModuleTriangle::Init() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(buffer_data), buffer_data, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 	return true;
 }
 
@@ -86,12 +87,9 @@ update_status ModuleTriangle::Update()
 	int vertexLocation = glGetUniformLocation(App->program->ProgramID, "gl_Position");
 
 	glUseProgram(App->program->ProgramID);
-	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,
-		"model"), 1, GL_TRUE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,
-		"view"), 1, GL_TRUE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,
-		"proj"), 1, GL_TRUE, &proj[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,"model"), 1, GL_TRUE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,"view"), 1, GL_TRUE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(App->program->ProgramID,"proj"), 1, GL_TRUE, &proj[0][0]);
 	glEnableVertexAttribArray(0); // attribute 0            
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0,                  // attribute 0                    

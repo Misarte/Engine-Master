@@ -107,6 +107,26 @@
       <Filter>MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="ModuleProgram.cpp" />
+    <ClCompile Include="ModuleIMGUI.cpp" />
+    <ClCompile Include="imgui-master\imgui.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_demo.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_draw.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_impl_opengl3.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_widgets.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui-master\imgui_impl_sdl.cpp">
+      <Filter>IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -126,10 +146,39 @@
       <Filter>MathGeoLib</Filter>
     </ClInclude>
     <ClInclude Include="ModuleProgram.h" />
+    <ClInclude Include="ModuleIMGUI.h" />
+    <ClInclude Include="imgui-master\imconfig.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui_impl_opengl3.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui_internal.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_rectpack.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_textedit.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imstb_truetype.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui-master\imgui_impl_sdl.h">
+      <Filter>IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">
       <UniqueIdentifier>{687dc6f0-6966-4af2-8a8b-66307dc0bc1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IMGUI">
+      <UniqueIdentifier>{b36d9847-f3a9-48b0-90bd-2b8edfc9979d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
