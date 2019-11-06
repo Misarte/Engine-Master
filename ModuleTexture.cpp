@@ -54,7 +54,7 @@ update_status ModuleTexture::Update()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 3));
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture_object);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 	//glUniform1i(glGetUniformLocation(App->program->, "texture0"), 0);
 	return UPDATE_CONTINUE;
 }

@@ -18,9 +18,10 @@ public:
 	float4x4 model;
 	float4x4 view;
 
+	Frustum frustum;
 	bool CleanUp();
 
 private:
-	GLuint vbo;
+	GLuint vbo, vao;
 };
 

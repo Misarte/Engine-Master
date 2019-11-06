@@ -127,6 +127,7 @@
       <Filter>IMGUI</Filter>
     </ClCompile>
     <ClCompile Include="ModuleTexture.cpp" />
+    <ClCompile Include="ModuleCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -172,6 +173,7 @@
       <Filter>IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="ModuleTexture.h" />
+    <ClInclude Include="ModuleCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">

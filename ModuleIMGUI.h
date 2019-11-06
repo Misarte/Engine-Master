@@ -23,6 +23,8 @@ public:
 	bool show_another_window = false;
 	bool console_window = false;
 	bool about_window = false;
+	bool grid = false;
+	bool axis = false;
 
 	//vector <float> logs;
 	void AddLog();
