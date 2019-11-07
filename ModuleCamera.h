@@ -1,5 +1,6 @@
-#pragma once
+
 #include "Module.h"
+#include "MathGeoLib.h"
 class ModuleCamera :
 	public Module
 {
@@ -16,8 +17,11 @@ public:
 	void ShowAxis();
 
 
-	//Frustum frustum;
-
+	Frustum frustum;
+	float4x4 LookAt(float3, float3, float3);
+	float4x4 proj;
+	float4x4 model;
+	float4x4 view;
 	bool CleanUp();
 };
 
