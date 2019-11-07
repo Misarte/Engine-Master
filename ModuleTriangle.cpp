@@ -86,7 +86,9 @@ update_status ModuleTriangle::PostUpdate()
 bool ModuleTriangle::CleanUp()
 {
 	LOG("Destroying renderer");
-
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteBuffers(1, &ebo);
 	//Destroy window
 
 	return true;
