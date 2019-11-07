@@ -12,14 +12,11 @@ public:
 	~ModuleTexture();
 
 	bool Init();
-	update_status PreUpdate();
-	update_status Update();
-	update_status PostUpdate();
 
-	ILuint LoadTexture(const char*);
+	void LoadTexture(const char*);
 
 	int width, height, nrChannels;
-	ILubyte *data = nullptr;
+	ILuint imageName;
 	GLuint texture_object;
 	GLuint textureID;
 	bool CleanUp();

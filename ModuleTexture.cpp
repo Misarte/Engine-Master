@@ -7,6 +7,7 @@
 #include "GL/glew.h"
 #include "MathGeoLib.h"
 #include "IL/il.h"
+#include "IL/ilut.h"
 
 
 ModuleTexture::ModuleTexture()
@@ -17,54 +18,38 @@ ModuleTexture::ModuleTexture()
 ModuleTexture::~ModuleTexture()
 {
 }
-GLuint ModuleTexture::LoadTexture(const char* texture_path)
-{
-	ilLoadImage(texture_path);
-	width = ilGetInteger(IL_IMAGE_WIDTH);
-	height = ilGetInteger(IL_IMAGE_HEIGHT);
-	data = ilGetData();
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	/*ILinfo ImageInfo;
-	iluGetImageInfo(&ImageInfo);
-	if (ImageInfo.Origin == IL_OROGIN_UPPER_LEFT)
-	{
-		iluFlipImage();
-	}*/
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	return textureID;
-}
 
-bool ModuleTexture::Init() 
+bool ModuleTexture::Init()
 {
-	float buffer_data[] = { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f};
-
 	//ilDeleteImages(1, &textureID);
+	ilInit();
+	iluInit();
+	ilutRenderer(ILUT_OPENGL);
+	ilGenImages(1, &imageName);
+	ilBindImage(imageName);
 	return true;
 }
 
-update_status ModuleTexture::PreUpdate()
+void ModuleTexture::LoadTexture(const char* texture_path)
 {
-
-	return UPDATE_CONTINUE;
-}
-update_status ModuleTexture::Update()
-{
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 3));
-	glActiveTexture(GL_TEXTURE0);
+	bool ok = ilLoadImage(texture_path);
+	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+	int width = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	const void* data = ilGetData();
+	
+	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	//glUniform1i(glGetUniformLocation(App->program->, "texture0"), 0);
-	return UPDATE_CONTINUE;
-}
-update_status ModuleTexture::PostUpdate()
-{
-
-	return UPDATE_CONTINUE;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 bool ModuleTexture::CleanUp()
 {
+	ilDeleteImages(1, &imageName);
 	return true;
 }

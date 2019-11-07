@@ -22,6 +22,6 @@ public:
 	bool CleanUp();
 
 private:
-	GLuint vbo, vao;
+	GLuint vbo, vao, ebo;
 };
 
