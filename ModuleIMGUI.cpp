@@ -16,12 +16,9 @@
 #include <filesystem>
 namespace fs = std::experimental::filesystem;
 
-
-
 ModuleIMGUI::ModuleIMGUI()
 {
 }
-
 
 ModuleIMGUI::~ModuleIMGUI()
 {
@@ -69,15 +66,12 @@ update_status ModuleIMGUI::Update()
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
+		ImGui::Checkbox("Camera constrols Window", &show_another_window);
 		ImGui::Checkbox("Console Window", &console_window);
 		ImGui::Checkbox("About Window", &about_window);
-		ImGui::Checkbox("Grid Ground", &grid);
-		ImGui::Checkbox("Show Axis", &axis);
-
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-		//ImGui::SliderFloat("CameraZoom", &, 0.0f, 1.0f);
+		
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
 		ImGui::SameLine();
@@ -89,7 +83,27 @@ update_status ModuleIMGUI::Update()
 	// 3. Show another simple window.
 	if (show_another_window)
 	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Begin("Camera controls", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Checkbox("Grid Ground", &grid);
+		ImGui::Checkbox("Show Axis", &axis);
+		if (ImGui::TreeNode("Camera Position"))
+		{
+			ImGui::SliderFloat("X", &(App->camera->frustum.pos.x), -10.0f, 10.0f);
+			ImGui::SliderFloat("Y", &(App->camera->frustum.pos.y), -10.0f, 10.0f);
+			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -10.0f, 10.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Camera Rotation"))
+		{
+			ImGui::SliderFloat("Up-X", &(App->camera->frustum.up.x), -10.0f, 10.0f);
+			ImGui::SliderFloat("Up-Y", &(App->camera->frustum.up.y), -10.0f, 10.0f);
+			ImGui::SliderFloat("Up-Z", &(App->camera->frustum.up.z), -10.0f, 10.0f);
+			ImGui::SliderFloat("Front-X", &(App->camera->frustum.front.x), -10.0f, 10.0f);
+			ImGui::SliderFloat("Front-Y", &(App->camera->frustum.front.y), -10.0f, 10.0f);
+			ImGui::SliderFloat("Front-Z", &(App->camera->frustum.front.z), -10.0f, 10.0f);
+			ImGui::TreePop();
+		}
+		
 		ImGui::Text("Hello from another window!");
 		if (ImGui::Button("Close Me"))
 			show_another_window = false;

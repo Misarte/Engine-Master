@@ -49,21 +49,14 @@ bool ModuleCamera::Init()
 {
 	float aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	frustum.type = FrustumType::PerspectiveFrustum;
-	frustum.pos = float3(0, 10, 0);
+	frustum.pos = float3(0.0f, 1.0f, 4.0f);
 	frustum.front = -float3::unitZ;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 100.0f;
 	frustum.verticalFov = math::pi / 4.0f;
 	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * aspect);
-	proj = frustum.ProjectionMatrix();
-	model = float4x4::FromTRS(float3(0.0f, 0.0f, -4.0f),
-		float3x3::RotateY(math::pi / 4.0f),
-		float3(1.0f, 1.0f, 1.0f));
-
-	view = LookAt(math::float3(0.0f, 1.0f, 4.0f),
-		math::float3(0.0f, 0.0f, 0.0f),
-		math::float3(0.0f, 1.0f, 0.0f));
+	
 
 	float4x4 transform = proj * view * float4x4(model);
 
@@ -80,7 +73,13 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::PreUpdate()
 {
-	
+	proj = frustum.ProjectionMatrix();
+
+	model = float4x4::FromTRS(float3(0.0f, 0.0f, -4.0f),
+			float3x3::RotateY(math::pi / 4.0f),
+		    float3(1.0f, 1.0f, 1.0f));
+
+	view = LookAt(frustum.pos, frustum.front + frustum.pos, frustum.up);
 	return UPDATE_CONTINUE;
 }
 update_status ModuleCamera::Update()
