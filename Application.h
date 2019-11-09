@@ -11,6 +11,11 @@ class ModuleInput;
 class ModuleTriangle;
 class ModuleProgram;
 class ModuleRenderExercise;
+class ModuleIMGUI;
+class ModuleTexture;
+class ModuleCamera;
+
+
 
 class Application
 {
@@ -29,7 +34,9 @@ public:
 	ModuleInput* input = nullptr;
 	ModuleTriangle* triangle = nullptr;
 	ModuleProgram* program = nullptr;
-
+	ModuleIMGUI* imgui = nullptr;
+	ModuleTexture* texture = nullptr;
+	ModuleCamera* camera = nullptr;
 private:
 
 	std::list<Module*> modules;
