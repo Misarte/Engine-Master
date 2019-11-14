@@ -22,16 +22,15 @@ bool ModuleTriangle::Init() {
 	float vertices[] = {
 		//position				//texture
 		-0.5F, -0.5F, 0.0F,		0.0F, 0.0F,
-		0.5F, -0.5F, 0.0F,		1.0F, -1.0F,
+		0.5F, -0.5F, 0.0F,		1.0F, 0.0F,
 		0.5F, 0.5F, 0.0F,		1.0F, 1.0F,
-		-0.5F, 0.5F, 0.0F,		-1.0F, 1.0F
+		-0.5F, 0.5F, 0.0F,		0.0F, 1.0F
 	};
 
 	unsigned int indices[] = {
 		0, 1, 2,
 		0, 2, 3
 	};
-
 	
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);

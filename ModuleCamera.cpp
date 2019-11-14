@@ -49,7 +49,7 @@ bool ModuleCamera::Init()
 {
 	float aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	frustum.type = FrustumType::PerspectiveFrustum;
-	frustum.pos = float3(0.0f, 1.0f, 4.0f);
+	frustum.pos = float3(0.0f, 0.0f, 4.0f);
 	frustum.front = -float3::unitZ;
 	frustum.up = float3::unitY;
 	frustum.nearPlaneDistance = 0.1f;

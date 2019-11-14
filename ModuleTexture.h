@@ -13,7 +13,7 @@ public:
 
 	bool Init();
 
-	void LoadTexture(const char*);
+	GLuint LoadTexture(const char*);
 
 	int width, height, nrChannels;
 	ILuint imageName;

@@ -98,13 +98,14 @@ update_status ModuleIMGUI::Update()
 			ImGui::SliderFloat("Up-X", &(App->camera->frustum.up.x), -10.0f, 10.0f);
 			ImGui::SliderFloat("Up-Y", &(App->camera->frustum.up.y), -10.0f, 10.0f);
 			ImGui::SliderFloat("Up-Z", &(App->camera->frustum.up.z), -10.0f, 10.0f);
+
 			ImGui::SliderFloat("Front-X", &(App->camera->frustum.front.x), -10.0f, 10.0f);
 			ImGui::SliderFloat("Front-Y", &(App->camera->frustum.front.y), -10.0f, 10.0f);
 			ImGui::SliderFloat("Front-Z", &(App->camera->frustum.front.z), -10.0f, 10.0f);
 			ImGui::TreePop();
 		}
 		
-		ImGui::Text("Hello from another window!");
+		ImGui::Text("Keeping this to add any text!");
 		if (ImGui::Button("Close Me"))
 			show_another_window = false;
 		ImGui::End();

@@ -14,7 +14,7 @@ class ModuleRenderExercise;
 class ModuleIMGUI;
 class ModuleTexture;
 class ModuleCamera;
-
+class msTimer;
 
 
 class Application
@@ -29,6 +29,7 @@ public:
 	bool CleanUp();
 
 public:
+	
 	ModuleRender * renderer = nullptr;
 	ModuleWindow* window = nullptr;
 	ModuleInput* input = nullptr;

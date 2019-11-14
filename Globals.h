@@ -1,6 +1,10 @@
 #pragma once
 #include <windows.h>
 #include <stdio.h>
+#include "SDL.h"
+#include "GL/glew.h"
+#include "MathGeoLib.h"
+#include <vector>
 
 #define LOG(format, ...) log(__FILE__, __LINE__, format, __VA_ARGS__);
 
@@ -20,3 +24,26 @@ enum update_status
 #define RESIZABLE true
 #define VSYNC true
 #define TITLE "Super Awesome Engine"
+
+struct Vertex {
+	float3 Position;
+	float3 Normal;
+	float2 TexCoords;
+	float3 Tangent;
+	float3 Bitangent;
+};
+
+struct Texture {
+	unsigned int id;
+	char type;
+	char* path;
+	int width;
+	int height;
+	const char* data;
+};
+
+struct Mesh {
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+	std::vector<Texture> textures;
+};

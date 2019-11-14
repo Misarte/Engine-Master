@@ -8,6 +8,7 @@
 #include "ModuleIMGUI.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
+#include "msTimer.h"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ Application::Application()
 	modules.push_back(texture = new ModuleTexture());
 	modules.push_back(triangle = new ModuleTriangle());
 	modules.push_back(imgui = new ModuleIMGUI());
-
+	
 }
 
 Application::~Application()
@@ -35,11 +36,13 @@ Application::~Application()
 
 bool Application::Init()
 {
+	msTimer* timer = nullptr;
+	timer->Start();
 	bool ret = true;
 
 	for (list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 		ret = (*it)->Init();
-
+	timer->Read();
 	return ret;
 }
 

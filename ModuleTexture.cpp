@@ -30,7 +30,7 @@ bool ModuleTexture::Init()
 	return true;
 }
 
-void ModuleTexture::LoadTexture(const char* texture_path)
+GLuint ModuleTexture::LoadTexture(const char* texture_path)
 {
 	bool ok = ilLoadImage(texture_path);
 	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
@@ -46,6 +46,7 @@ void ModuleTexture::LoadTexture(const char* texture_path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
+	return textureID;
 }
 
 bool ModuleTexture::CleanUp()
