@@ -8,6 +8,7 @@
 #include "ModuleIMGUI.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
+#include "ModuleModelLoader.h"
 #include "msTimer.h"
 
 using namespace std;
@@ -23,6 +24,7 @@ Application::Application()
 	modules.push_back(texture = new ModuleTexture());
 	modules.push_back(triangle = new ModuleTriangle());
 	modules.push_back(imgui = new ModuleIMGUI());
+	modules.push_back(model = new ModuleModelLoader());
 	
 }
 

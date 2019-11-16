@@ -22,7 +22,7 @@ public:
 	float4x4 proj;
 	float4x4 model;
 	float4x4 view;
-
+	float speedCamera = 5.0f;
 	float3 cameraPos = math::float3(0.0f, 1.0f, 4.0f);
 	float3 cameraUp = math::float3(0.0f, 1.0f, 0.0f);
 	float3 cameraFront = math::float3(0.0f, -1.0f, -4.0f);

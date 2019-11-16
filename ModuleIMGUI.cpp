@@ -88,9 +88,9 @@ update_status ModuleIMGUI::Update()
 		ImGui::Checkbox("Show Axis", &axis);
 		if (ImGui::TreeNode("Camera Position"))
 		{
-			ImGui::SliderFloat("X", &(App->camera->frustum.pos.x), -10.0f, 10.0f);
-			ImGui::SliderFloat("Y", &(App->camera->frustum.pos.y), -10.0f, 10.0f);
-			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -10.0f, 10.0f);
+			ImGui::SliderFloat("X", &(App->camera->frustum.pos.x), -50.0f, 50.0f);
+			ImGui::SliderFloat("Y", &(App->camera->frustum.pos.y), -50.0f, 50.0f);
+			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -50.0f, 50.0f);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Camera Rotation"))
@@ -123,22 +123,16 @@ update_status ModuleIMGUI::Update()
 	//show console window
 	if (console_window)
 	{
-		//ImGuiTextBuffer     Buf;
-		//ImGuiTextFilter     Filter;
-		//ImVector<int>       LineOffsets;        // Index to lines offset
-		//bool                ScrollToBottom;
-
-		////LOG(Buf);
-		//ScrollToBottom = true;
-		////Buf  = SDL_LOG
-		//ImGui::Begin("Console window", &console_window);
-		//ImGui::TextUnformatted(Buf.begin());
-		//if (ScrollToBottom)
-		//	ImGui::SetScrollHere(1.0f);
-		//ScrollToBottom = false;
-		//if (ImGui::Button("Close Me"))
-		//	console_window = false;
-		//ImGui::End();
+		ScrollToBottom = true;
+		//Buf  = SDL_LOG
+		ImGui::Begin("Console window", &console_window);
+		ImGui::TextUnformatted(Buf.begin());
+		if (ScrollToBottom)
+			ImGui::SetScrollHere(1.0f);
+		ScrollToBottom = false;
+		if (ImGui::Button("Close Me"))
+			console_window = false;
+		ImGui::End();
 
 
 	}
@@ -300,6 +294,14 @@ update_status ModuleIMGUI::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
+void  ModuleIMGUI::AddLog(const char* fmt, ...)
+{
+	static va_list  ap;
+	va_start(ap, fmt);
+	Buf.appendfv(fmt, ap);
+	va_end(ap);
+	ScrollToBottom = true;
+}
 bool ModuleIMGUI::CleanUp()
 {
 	LOG("Destroying program");

@@ -14,6 +14,7 @@ class ModuleRenderExercise;
 class ModuleIMGUI;
 class ModuleTexture;
 class ModuleCamera;
+class ModuleModelLoader;
 class msTimer;
 
 
@@ -38,6 +39,7 @@ public:
 	ModuleIMGUI* imgui = nullptr;
 	ModuleTexture* texture = nullptr;
 	ModuleCamera* camera = nullptr;
+	ModuleModelLoader* model = nullptr;
 private:
 
 	std::list<Module*> modules;

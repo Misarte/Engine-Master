@@ -13,8 +13,8 @@ public:
 
 	bool Init();
 
-	GLuint LoadTexture(const char*);
-
+	Texture LoadTexture(const char*);
+	Texture texture;
 	int width, height, nrChannels;
 	ILuint imageName;
 	GLuint texture_object;

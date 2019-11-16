@@ -35,11 +35,11 @@ struct Vertex {
 
 struct Texture {
 	unsigned int id;
-	char type;
-	char* path;
+	char* type;
+	const char* path;
 	int width;
 	int height;
-	const char* data;
+	unsigned char* data;
 };
 
 struct Mesh {

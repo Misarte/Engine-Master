@@ -127,6 +127,7 @@
     </ClCompile>
     <ClCompile Include="log.cpp" />
     <ClCompile Include="msTimer.cpp" />
+    <ClCompile Include="ModuleModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -165,6 +166,7 @@
       <Filter>IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="msTimer.h" />
+    <ClInclude Include="ModuleModelLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">

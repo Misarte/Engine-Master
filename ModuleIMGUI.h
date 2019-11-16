@@ -27,6 +27,8 @@ public:
 	bool axis = false;
 
 	//vector <float> logs;
-	void AddLog();
+	void AddLog(const char* fmt, ...);
+	ImGuiTextBuffer Buf;
+	bool ScrollToBottom;
 	bool CleanUp();
 };

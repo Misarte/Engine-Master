@@ -19,7 +19,7 @@ ModuleModelLoader::~ModuleModelLoader()
 void ModuleModelLoader::LoadModel(const char* path)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
 		LOG("ERROR::ASSIMP:: ", importer.GetErrorString());
@@ -46,7 +46,7 @@ void ModuleModelLoader::processNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-Mesh ModuleModelLoader::processMesh(aiMesh *mesh, const aiScene *scene)
+Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 {
 	Mesh loadedMesh;
 	// Walk through each of the mesh's vertices
@@ -98,12 +98,6 @@ Mesh ModuleModelLoader::processMesh(aiMesh *mesh, const aiScene *scene)
 	}
 	// process materials
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-	// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-	// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-	// Same applies to other texture as the following list summarizes:
-	// diffuse: texture_diffuseN
-	// specular: texture_specularN
-	// normal: texture_normalN
 
 	// 1. diffuse maps
 	std::vector<Texture> diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
@@ -143,8 +137,9 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 		if (!skip)
 		{   // if texture hasn't been loaded already, load it
 			Texture texture;
-			texture.id = App->texture->LoadTexture(directory);
-			//texture.type = typeName;
+			texture = App->texture->LoadTexture(str.C_Str());
+			//texture.path = str.C_Str();
+			texture.type = typeName;
 			textures.push_back(texture);
 			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 		}

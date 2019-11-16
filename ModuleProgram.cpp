@@ -1,5 +1,7 @@
 #include "ModuleProgram.h"
 #include "MathGeoLib.h"
+#include "ModuleIMGUI.h"
+#include "Application.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -66,7 +68,7 @@ GLuint ModuleProgram::LoadShader(const char* vertex_file_path, const char* fragm
 	if (InfoLogLengthVs > 0) {
 		std::vector<char> VertexShaderErrorMessage(InfoLogLengthVs + 1);
 		glGetShaderInfoLog(VertexShaderID, InfoLogLengthVs, NULL, &VertexShaderErrorMessage[0]);
-		LOG("%s\n", &VertexShaderErrorMessage[0]);
+		App->imgui->AddLog("%s\n", &VertexShaderErrorMessage[0]);
 	}
 	// Link the program
 	printf("Linking program\n");
@@ -80,7 +82,7 @@ GLuint ModuleProgram::LoadShader(const char* vertex_file_path, const char* fragm
 	if (InfoLogLengthVs > 0) {
 		std::vector<char> ProgramErrorMessage(InfoLogLengthVs + 1);
 		glGetProgramInfoLog(ProgramID, InfoLogLengthVs, NULL, &ProgramErrorMessage[0]);
-		LOG("%s\n", &ProgramErrorMessage[0]);
+		App->imgui->AddLog("%s\n", &ProgramErrorMessage[0]);
 	}
 	//------------------Fragment-----------------------
 	glShaderSource(FragmentShaderID, 1, &fShaderCode, NULL);
@@ -90,7 +92,7 @@ GLuint ModuleProgram::LoadShader(const char* vertex_file_path, const char* fragm
 	if (InfoLogLengthFs > 0) {
 		std::vector<char> FragmentShaderErrorMessage(InfoLogLengthFs + 1);
 		glGetShaderInfoLog(FragmentShaderID, InfoLogLengthFs, NULL, &FragmentShaderErrorMessage[0]);
-		LOG("%s\n", &FragmentShaderErrorMessage[0]);
+		App->imgui->AddLog("%s\n", &FragmentShaderErrorMessage[0]);
 	}
 	// Link the program
 	printf("Linking program\n");
@@ -104,7 +106,7 @@ GLuint ModuleProgram::LoadShader(const char* vertex_file_path, const char* fragm
 	if (InfoLogLengthFs > 0) {
 		std::vector<char> ProgramErrorMessage(InfoLogLengthFs + 1);
 		glGetProgramInfoLog(ProgramID, InfoLogLengthFs, NULL, &ProgramErrorMessage[0]);
-		LOG("%s\n", &ProgramErrorMessage[0]);
+		App->imgui->AddLog("%s\n", &ProgramErrorMessage[0]);
 	}
 
 	glDetachShader(ProgramID, VertexShaderID);
@@ -135,7 +137,7 @@ update_status ModuleProgram::PostUpdate()
 
 bool ModuleProgram::CleanUp()
 {
-	LOG("Destroying program");
+	App->imgui->AddLog("Destroying program");
 
 	//Destroy window
 	glDetachShader(ProgramID, VertexShaderID);

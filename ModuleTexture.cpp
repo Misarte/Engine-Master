@@ -1,5 +1,6 @@
 #include "ModuleTexture.h"
 #include "ModuleTriangle.h"
+#include "ModuleIMGUI.h"
 #include "MathGeoLib.h"
 #include "ModuleProgram.h"
 #include "Globals.h"
@@ -30,23 +31,27 @@ bool ModuleTexture::Init()
 	return true;
 }
 
-GLuint ModuleTexture::LoadTexture(const char* texture_path)
+Texture ModuleTexture::LoadTexture(const char* texture_path)
 {
 	bool ok = ilLoadImage(texture_path);
+	//iluGetImageInfo(&ImageInfo);
+	iluFlipImage();
 	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-	int width = ilGetInteger(IL_IMAGE_WIDTH);
-	int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	const void* data = ilGetData();
-	
-	glGenTextures(1, &textureID);
+	texture.width = ilGetInteger(IL_IMAGE_WIDTH);
+	texture.height = ilGetInteger(IL_IMAGE_HEIGHT);
+	texture.data = ilGetData();
+	texture.id = ilutGLBindTexImage();
+	texture.path = texture_path;
+	App->imgui->AddLog("PATH---------------%s\n", texture.path);
+	/*glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	return textureID;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture.width, texture.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture.data);
+	glGenerateMipmap(GL_TEXTURE_2D);*/
+	return texture;
 }
 
 bool ModuleTexture::CleanUp()
