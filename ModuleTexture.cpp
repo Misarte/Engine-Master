@@ -33,16 +33,22 @@ bool ModuleTexture::Init()
 
 Texture ModuleTexture::LoadTexture(const char* texture_path)
 {
-	bool ok = ilLoadImage(texture_path);
-	//iluGetImageInfo(&ImageInfo);
-	iluFlipImage();
+	loaded = ilLoadImage(texture_path);
+	//iluFlipImage();
 	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
 	texture.width = ilGetInteger(IL_IMAGE_WIDTH);
 	texture.height = ilGetInteger(IL_IMAGE_HEIGHT);
 	texture.data = ilGetData();
 	texture.id = ilutGLBindTexImage();
 	texture.path = texture_path;
-	App->imgui->AddLog("PATH---------------%s\n", texture.path);
+	/*if (loaded)
+	{
+		App->imgui->AddLog("Loading Texture from given path:%s\n", texture.path);
+	}
+	else
+	{
+		App->imgui->AddLog("Failed to Load Texture from given path:%s\n", texture.path);
+	}*/
 	/*glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

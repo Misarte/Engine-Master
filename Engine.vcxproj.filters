@@ -167,6 +167,7 @@
     </ClInclude>
     <ClInclude Include="msTimer.h" />
     <ClInclude Include="ModuleModelLoader.h" />
+    <ClInclude Include="..\SDL-Game2-Master\Point.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">

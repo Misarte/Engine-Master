@@ -61,8 +61,8 @@ update_status ModuleIMGUI::Update()
 	{
 		static float f = 0.0f;
 		static int counter = 0;
-
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+	//ImGui:BeginMenu("");
+		ImGui::Begin("Main Window");                          // Create a window called "Hello, world!" and append into it.
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
 		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state

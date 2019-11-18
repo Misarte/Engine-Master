@@ -15,6 +15,7 @@ public:
 
 	Texture LoadTexture(const char*);
 	Texture texture;
+	bool loaded = NULL;
 	int width, height, nrChannels;
 	ILuint imageName;
 	GLuint texture_object;

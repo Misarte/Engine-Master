@@ -1,10 +1,17 @@
 #include "ModuleModelLoader.h"
+#include <string>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Application.h"
 #include "ModuleTexture.h"
-
+#include "ModuleIMGUI.h"
+#include <sys/stat.h>
+#include <fstream>
+#include <iostream>
+#include <assimp/IOStream.hpp>
+#include <assimp/IOSystem.hpp>
+#include <assimp/DefaultLogger.hpp>
 
 
 ModuleModelLoader::ModuleModelLoader()
@@ -18,6 +25,12 @@ ModuleModelLoader::~ModuleModelLoader()
 
 void ModuleModelLoader::LoadModel(const char* path)
 {
+	// Create a logger instance 
+	DefaultLogger::create("", Logger::VERBOSE);
+	// Now I am ready for logging my stuff
+	DefaultLogger::get()->info("this is my info-call");
+	// Kill it after the work is done
+	DefaultLogger::kill();
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
@@ -25,6 +38,7 @@ void ModuleModelLoader::LoadModel(const char* path)
 		LOG("ERROR::ASSIMP:: ", importer.GetErrorString());
 		return;
 	}
+	const unsigned int severity = Logger::Debugging | Logger::Info | Logger::Err | Logger::Warn;
 	directory = path;
 	processNode(scene->mRootNode, scene);
 }
@@ -123,13 +137,18 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 	{
 		aiString str;
 		mat->GetTexture(type, i, &str);
+		App->imgui->AddLog("Texture Name that should be loaded: %s\n", str.C_Str());
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
+		bool skipToSourceFolder = false;
+		bool skipToMyFolder = false;
 		for (unsigned int j = 0; j < textures_loaded.size(); j++)
 		{
 			if (std::strcmp(textures_loaded[j].path, str.C_Str()) == 0)
 			{
+				App->imgui->AddLog("Texture was loaded from fbx description path: %s\n", textures_loaded[j].path);
 				textures.push_back(textures_loaded[j]);
+				//myTexturesPath = str.C_Str().append("Textures/");
 				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
 				break;
 			}
@@ -138,6 +157,58 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 		{   // if texture hasn't been loaded already, load it
 			Texture texture;
 			texture = App->texture->LoadTexture(str.C_Str());
+			App->imgui->AddLog("Seeking Texture in fbx description path: %s\n", str.C_Str());
+			std::fstream file("Baker_house.png");
+			if (!file)
+			{
+				App->imgui->AddLog("File does NOT exist in fbx description path\n");
+				skipToSourceFolder = true;
+			}
+			if (file)
+			{
+				App->imgui->AddLog("Found File in fbx description path\n");
+			}
+			//texture.path = str.C_Str();
+			texture.type = typeName;
+			textures.push_back(texture);
+			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+			break;
+		}
+		if (skipToSourceFolder)
+		{   // if texture hasn't been loaded already, load it
+			Texture texture;
+			
+			fullPath =+ sourcePath;
+			fullPath =+"Baker_house.png";
+			App->imgui->AddLog(fullPath);
+			std::fstream file(fullPath);
+			if (!file)
+			{
+				App->imgui->AddLog("File does NOT exist in source folder path\n");
+				skipToMyFolder = true;
+			}
+			texture = App->texture->LoadTexture(fullPath);
+			App->imgui->AddLog("Seeking Texture source folder path: %s\n", fullPath);
+			//texture.path = str.C_Str();
+			texture.type = typeName;
+			textures.push_back(texture);
+			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+			break;
+		}
+		if (skipToMyFolder)
+		{   // if texture hasn't been loaded already, load it
+			Texture texture;
+			fullPath2 =+ myTexturesPath;
+			fullPath2 =+"Baker_house.png";
+			App->imgui->AddLog(fullPath2);
+			std::fstream file(fullPath2);
+			if (file)
+			{
+				App->imgui->AddLog("Found File in my Textures folder path\n");
+			}
+			texture = App->texture->LoadTexture(myTexturesPath);
+			App->imgui->AddLog("Seeking Texture in my Textures path: %s\n", fullPath2);
+			
 			//texture.path = str.C_Str();
 			texture.type = typeName;
 			textures.push_back(texture);
@@ -146,6 +217,8 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 	}
 	return textures;
 }
+
+
 
 
 

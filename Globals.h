@@ -20,6 +20,7 @@ enum update_status
 // Configuration -----------
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
+#define SCREEN_SIZE 2
 #define FULLSCREEN false
 #define RESIZABLE true
 #define VSYNC true

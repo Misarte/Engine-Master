@@ -1,6 +1,7 @@
 #include "ModuleCamera.h"
 #include "ModuleTriangle.h"
 #include "MathGeoLib.h"
+#include "ModuleInput.h"
 #include "ModuleProgram.h"
 #include "Globals.h"
 #include "Application.h"
@@ -84,6 +85,38 @@ update_status ModuleCamera::PreUpdate()
 }
 update_status ModuleCamera::Update()
 {
+	//While Right clicking, “WASD” fps-like movement and free look around must be enabled.
+	//if (App->input->GetMouseButtonDown(SDL_BUTTON_RIGHT))
+	//{
+		LOG("MOUSE RIGHT CLICK\n");
+		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+		{
+			App->camera->frustum.pos.x += App->camera->speedCamera;
+		}
+		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+		{
+			App->camera->frustum.pos.x -= App->camera->speedCamera;
+		}
+		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
+		{
+			App->camera->frustum.pos.y += App->camera->speedCamera;
+		}
+		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+		{
+			App->camera->frustum.pos.y -= App->camera->speedCamera;
+		}
+	//}
+
+	//Mouse wheel should zoom in and out (move close the camera, do not use FOV to zoom)
+	if (App->input->GetMouseButtonDown(SDL_MOUSEWHEEL_NORMAL) == KEY_DOWN)
+	{
+		frustum.pos.z += speedCamera;
+	}
+	if (App->input->GetMouseButtonDown(SDL_MOUSEWHEEL_FLIPPED) == KEY_DOWN)
+	{
+		frustum.pos.z -= speedCamera;
+	}
+	
 	return UPDATE_CONTINUE;
 }
 
