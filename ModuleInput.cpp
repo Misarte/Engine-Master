@@ -3,7 +3,13 @@
 #include "ModuleInput.h"
 #include "ModuleIMGUI.h"
 #include "ModuleWindow.h"
+#include "ModuleTriangle.h"
+#include "ModuleTexture.h"
+#include "ModuleProgram.h"
+#include "ModuleModelLoader.h"
 #include "SDL.h"
+#include <iostream>
+#include <string>
 
 #define MAX_KEYS 300
 
@@ -39,12 +45,22 @@ bool ModuleInput::Init()
 // Called each loop iteration
 update_status ModuleInput::PreUpdate()
 {
+	
+
+	return UPDATE_CONTINUE;
+}
+
+// Called every draw update
+update_status ModuleInput::Update()
+{
+	SDL_PumpEvents();
 	static SDL_Event event;
 
 	mouse_motion = { 0, 0 };
 	memset(windowEvents, false, WE_COUNT * sizeof(bool));
 
 	const Uint8* keys = SDL_GetKeyboardState(NULL);
+	//SDL_Get
 
 	for (int i = 0; i < MAX_KEYS; ++i)
 	{
@@ -108,6 +124,12 @@ update_status ModuleInput::PreUpdate()
 		case SDL_MOUSEBUTTONUP:
 			mouse_buttons[event.button.button - 1] = KEY_UP;
 			break;
+		case SDL_MOUSEWHEEL_NORMAL:
+			mouse_buttons[event.button.button - 1] = KEY_DOWN;
+			break;
+		case SDL_MOUSEWHEEL_FLIPPED:
+			mouse_buttons[event.button.button - 1] = KEY_DOWN;
+			break;
 
 		case SDL_MOUSEMOTION:
 			mouse_motion.x = event.motion.xrel / SCREEN_SIZE;
@@ -115,21 +137,38 @@ update_status ModuleInput::PreUpdate()
 			mouse.x = event.motion.x / SCREEN_SIZE;
 			mouse.y = event.motion.y / SCREEN_SIZE;
 			break;
+		case SDL_DROPFILE:
+			App->model->meshes.clear();
+			App->imgui->AddLog("FILE DROPPED from:%s\n", event.drop.file);
+			dropped_filedir = event.drop.file;
+			if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "fbx")
+			{
+				App->imgui->AddLog("MODEL DROPPED from:%s\n", event.drop.file);
+				App->model->LoadModel(event.drop.file);
+				for (unsigned int i = 0; i < App->model->meshes.size(); i++)
+				{
+					App->triangle->SetUpMesh(App->model->meshes[i]);
+				}
+				//App->program->LoadShader("default.vs", "default.fs");
+			}
+			else if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "png")
+			{
+				//App->texture->CleanUp();
+				App->imgui->AddLog("TEXTURE DROPPED from:%s\n", event.drop.file);
+				App->texture->LoadTexture(event.drop.file);
+				//App->program->LoadShader("default.vs", "default.fs");
+			}
+			else
+			{
+				App->imgui->AddLog("Not Supported file drop");
+			}
+			SDL_free(event.drop.file);
+			break;
 		}
-	}
 
+	}
 	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
 		return UPDATE_STOP;
-
-	return UPDATE_CONTINUE;
-}
-
-// Called every draw update
-update_status ModuleInput::Update()
-{
-	SDL_PumpEvents();
-
-	//keyboard = SDL_GetKeyboardState(NULL);
 
 	return UPDATE_CONTINUE;
 }
@@ -154,3 +193,4 @@ const iPoint& ModuleInput::GetMouseMotion() const
 {
 	return mouse_motion;
 }
+

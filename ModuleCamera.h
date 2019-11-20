@@ -22,7 +22,8 @@ public:
 	float4x4 proj;
 	float4x4 model;
 	float4x4 view;
-	float speedCamera = 0.1f;
+	float speedCamera = SPEED_CAM;
+	float distance;
 	/*float3 cameraPos = App->camera->frustum.pos;
 	float3 cameraUp = math::float3(0.0f, 1.0f, 0.0f);
 	float3 cameraFront = math::float3(0.0f, -1.0f, -4.0f);*/

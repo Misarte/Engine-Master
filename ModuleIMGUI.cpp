@@ -1,8 +1,8 @@
 #include "ModuleIMGUI.h"
-#include "ModuleCamera.h"
 #include "Application.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleCamera.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include "imgui.h"
@@ -55,32 +55,65 @@ update_status ModuleIMGUI::PreUpdate()
 
 update_status ModuleIMGUI::Update()
 {
-	if (show_demo_window)
-		ImGui::ShowDemoWindow(&show_demo_window);
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("Main Menu")) 
 	{
-		static float f = 0.0f;
-		static int counter = 0;
-	//ImGui:BeginMenu("");
-		ImGui::Begin("Main Window");                          // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Camera constrols Window", &show_another_window);
-		ImGui::Checkbox("Console Window", &console_window);
-		ImGui::Checkbox("About Window", &about_window);
-		//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-		
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+		ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
+		ImGui::MenuItem("About Window", NULL, &about_window);
+		ImGui::MenuItem("Visit Githubpage", NULL, &git);
+		ImGui::Separator();
+		ImGui::MenuItem("Quit", "Alt+F4", &quit);
+		ImGui::EndMenu();
 	}
-	// 3. Show another simple window.
+	if (ImGui::BeginMenu("Tools"))
+	{
+		ImGui::MenuItem("Camera constrols Window", NULL, &show_another_window);
+		ImGui::MenuItem("Console Window", NULL, &console_window);
+		ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
+		ImGui::MenuItem("Configurations Window", NULL, &config_window);
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
+		
+	if (quit) 
+	{
+		return UPDATE_STOP;
+	}
+	if (git)
+	{
+		ShellExecute(0, 0, "https://github.com/Misarte/Engine-Master", 0, 0, SW_SHOW);
+		git = false;
+		//return UPDATE_STOP;
+
+	}
+	if (show_demo_window)
+	{
+		ImGui::ShowDemoWindow(&show_demo_window);
+	}
+//		
+//	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+//	{
+//		static float f = 0.0f;
+//		static int counter = 0;
+//		ImGui::Begin("Main Window");
+//		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+//		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+//		ImGui::Checkbox("Camera constrols Window", &show_another_window);
+//		ImGui::Checkbox("Console Window", &console_window);
+//		ImGui::Checkbox("About Window", &about_window);
+//		//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+//		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+//		
+//		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+//			counter++;
+//		ImGui::SameLine();
+//		ImGui::Text("counter = %d", counter);
+//
+//		
+//		ImGui::End();
+//	}
+
+//Show Camera controls window.
 	if (show_another_window)
 	{
 		ImGui::Begin("Camera controls", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
@@ -120,7 +153,7 @@ update_status ModuleIMGUI::Update()
 		App->camera->ShowAxis();
 	}
 
-	//show console window
+//	//show console window
 	if (console_window)
 	{
 		ScrollToBottom = true;
@@ -133,10 +166,62 @@ update_status ModuleIMGUI::Update()
 		if (ImGui::Button("Close Me"))
 			console_window = false;
 		ImGui::End();
-
-
+		
 	}
-	// 3. Show about simple window.
+	// Show config window
+	if (config_window)
+	{
+		ImGui::Begin("Configuration window", &config_window);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Separator();
+		fps_log.push_back(ImGui::GetIO().Framerate);
+		if (fps_log.size() > 110) {
+			char title[25];
+			sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+			fps_log.erase(fps_log.begin());
+		}
+		ImGui::Separator();
+		if (ImGui::TreeNode("Modules"))
+		{
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Libraries Configuration"))
+		{
+			ImGui::BeginChildFrame(ImGui::GetID("libraries"), ImVec2(ImGui::GetWindowContentRegionWidth() - 45, ImGui::GetTextLineHeightWithSpacing() * 7), ImGuiWindowFlags_NoMove);
+			//ImGui::Text("IMGUI: %s", ImGui::GetVersion());
+			ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+			ImGui::Separator();
+			SDL_version compiled;
+			SDL_version linked;
+			SDL_VERSION(&compiled);
+			SDL_GetVersion(&linked);
+
+			ImGui::Text("SDL Compiled version: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
+			ImGui::Text("SDL Linked version: %d.%d.%d.\n", linked.major, linked.minor, linked.patch);
+			ImGui::Separator();
+			const char* versionGL = (char *)(glGetString(GL_VERSION));
+			ImGui::Text("Glew Version: %s", versionGL);
+			/*ImGui::Separator();
+			const char* devil = (char *)(glGetString(GL_VERSION));
+			ImGui::Text("DevIL: %s", devil);*/
+			ImGui::Separator();
+			ImGui::Text("MathGeo Library");
+			/*std::string path = "/MathGeoLib/include/";
+			for (const auto & entry : fs::directory_iterator(path))
+			ImGui::Text("MathGeo File: %s");*/
+
+			ImGui::Separator();
+			//ILuint ilversion = iluGetInteger(ILU_VERSION_NUM);
+			ImGui::Text("DevIl Library");
+			ImGui::EndChildFrame();
+			ImGui::TreePop();
+		}
+		if (ImGui::Button("Close Me"))
+			config_window = false;
+		ImGui::End();
+	}
+	// Show about  window.
 	if (about_window)
 	{
 		ImGui::Begin("About Window", &about_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
@@ -243,41 +328,10 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("Description: Artemis Game Engine");
 				ImGui::Separator();
 				ImGui::Text("Author: Artemis Georgakopoulou");
+				ImGui::Separator();
 				ImGui::EndChildFrame();
 				ImGui::TreePop();
 			}
-			if (ImGui::TreeNode("Libraries Configuration"))
-			{
-				ImGui::BeginChildFrame(ImGui::GetID("libraries"), ImVec2(ImGui::GetWindowContentRegionWidth() - 45, ImGui::GetTextLineHeightWithSpacing() * 7), ImGuiWindowFlags_NoMove);
-				//ImGui::Text("IMGUI: %s", ImGui::GetVersion());
-				ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-				ImGui::Separator();
-				SDL_version compiled;
-				SDL_version linked;
-				SDL_VERSION(&compiled);
-				SDL_GetVersion(&linked);
-
-				ImGui::Text("SDL Compiled version: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
-				ImGui::Text("SDL Linked version: %d.%d.%d.\n", linked.major, linked.minor, linked.patch);
-				ImGui::Separator();
-				const char* versionGL = (char *)(glGetString(GL_VERSION));
-				ImGui::Text("Glew Version: %s", versionGL);
-				/*ImGui::Separator();
-				const char* devil = (char *)(glGetString(GL_VERSION));
-				ImGui::Text("DevIL: %s", devil);*/
-				ImGui::Separator();
-				ImGui::Text("MathGeo Library");
-				/*std::string path = "/MathGeoLib/include/";
-				for (const auto & entry : fs::directory_iterator(path))
-				ImGui::Text("MathGeo File: %s");*/
-
-				ImGui::Separator();
-				//ILuint ilversion = iluGetInteger(ILU_VERSION_NUM);
-				ImGui::Text("DevIl Library");
-				ImGui::EndChildFrame();
-				ImGui::TreePop();
-			}
-
 		}
 		if (ImGui::Button("Close Me"))
 			about_window = false;

@@ -18,6 +18,8 @@ enum update_status
 };
 
 // Configuration -----------
+
+#define SPEED_CAM 0.05f
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define SCREEN_SIZE 2

@@ -38,7 +38,6 @@ void ModuleModelLoader::LoadModel(const char* path)
 		LOG("ERROR::ASSIMP:: ", importer.GetErrorString());
 		return;
 	}
-	const unsigned int severity = Logger::Debugging | Logger::Info | Logger::Err | Logger::Warn;
 	directory = path;
 	processNode(scene->mRootNode, scene);
 }

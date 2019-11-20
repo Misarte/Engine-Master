@@ -4,8 +4,9 @@
 #include "Globals.h"
 #include "SDL_scancode.h"
 #include "./Point.h"
+#include <string>
 
-#define NUM_MOUSE_BUTTONS 5
+#define NUM_MOUSE_BUTTONS 3
 enum EventWindow
 {
 	WE_QUIT = 0,
@@ -41,9 +42,9 @@ public:
 		return keyboard[id];
 	}
 
-	KeyState GetMouseButtonDown(int id) const
+	Uint32 GetMouseButtonDown(int id) const
 	{
-		return mouse_buttons[id - 1];
+		return SDL_GetMouseState(NULL, NULL);
 	}
 
 	// Check for window events last frame
@@ -52,13 +53,14 @@ public:
 	// Get mouse / axis position
 	const iPoint& GetMouseMotion() const;
 	const iPoint& GetMousePosition() const;
-
+	std::string dropped_filedir;
 private:
 	bool windowEvents[WE_COUNT];
 	KeyState* keyboard = NULL;
 	KeyState mouse_buttons[NUM_MOUSE_BUTTONS];
 	iPoint mouse_motion;
 	iPoint mouse;
+	
 //private:
 //	const Uint8 *keyboard = NULL;
 };
