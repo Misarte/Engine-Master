@@ -86,53 +86,86 @@ update_status ModuleCamera::PreUpdate()
 }
 update_status ModuleCamera::Update()
 {
+	speedCamera = SPEED_CAM;
+	if ((App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT))
+	{
+		speedCamera = speedCamera * 2;
+		App->imgui->AddLog("SPEED/n", speedCamera);
+	}
 	//While Right clicking, “WASD” fps-like movement and free look around must be enabled.
 	if (App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_RIGHT)) & SDL_BUTTON(3))
 	{
 		App->imgui->AddLog("MOUSE RIGHT CLICK\n");
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 		{
-			App->camera->frustum.pos.x += App->camera->speedCamera;
+			frustum.pos += speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
 		}
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 		{
-			App->camera->frustum.pos.x -= App->camera->speedCamera;
+			frustum.pos -= speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
+			//App->camera->frustum.pos.Normalize();
 		}
 		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 		{
-			App->camera->frustum.pos.y += App->camera->speedCamera;
+			frustum.pos += speedCamera * frustum.front;
 		}
 		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 		{
-			App->camera->frustum.pos.y -= App->camera->speedCamera;
+			frustum.pos -= speedCamera * frustum.front;
 		}
-		if ((App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT))
+		
+		if (App->input->GetMouseMotion().x )
 		{
-			App->camera->speedCamera += App->camera->speedCamera * 0.02;
-		}
-		App->camera->speedCamera = SPEED_CAM;
-		if (SDL_MOUSEMOTION)
-		{
-			//App->camera->frustum.pos += Cross(App->camera->frustum.front, App->camera->frustum.up) * App->camera->speedCamera;
+			App->camera->frustum.pos += App->camera->frustum.up.Cross(App->camera->frustum.up);
 			//App->input->GetMouseMotion();
 		}
-	}
-	if (App->input->GetMouseButtonDown(SDL_MOUSEWHEEL_NORMAL)& SDL_BUTTON_MIDDLE)
-	{
-		frustum.pos.z += speedCamera;
-	}
-	if (App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_RIGHT)) & SDL_BUTTON(1))
-	{
-		distance = App->camera->frustum.Distance(App->camera->model.TransformPos);
-		glTranslatef(0, 0, distance);/*
-		glRotatef(angley, 0, 1, 0);
-		glRotatef(anglex, 1, 0, 0);*/
-		glTranslatef(0, 0, -distance);
-
+		////if (App->input->Get)
+		//{
+		//	App->camera->frustum.pos += App->camera->frustum.up.Cross(App->camera->frustum.up);
+		//	//App->input->GetMouseMotion();
+		//}
 	}
 	return UPDATE_CONTINUE;
 }
+void ModuleCamera::ZoomIn()
+{
+	frustum.pos += speedCamera * frustum.front;
+}
 
+void ModuleCamera::ZoomOut()
+{
+	frustum.pos -= speedCamera * frustum.front;
+}
+//void MooveCam(Axis xyz)
+//{
+//	switch (xyz)
+//	{
+//	case X:
+//		break;
+//	case Y:
+//		break;
+//	case Z:
+//		break;
+//	}
+//}
+/*void RotateCam(const char* axis, float move) 
+{
+	if (axis == "X")
+	{
+
+	}
+	if (axis == "Y")
+	{
+		App->camera->rotation = float3x3::RotateY(move * App->camera->speedCamera);
+		App->camera->frustum.up = App->camera->rotation * App->camera->frustum.up;
+		App->camera->frustum.front = App->camera->rotation * App->camera->frustum.front;
+
+	}
+	if (axis == "Z")
+	{
+		const float angle = asinf(App->camera->frustum.front.y / App->camera->frustum.front.Length());
+	}
+}*/
 void ModuleCamera::ShowGrid()
 {
 	glLineWidth(1.0f);

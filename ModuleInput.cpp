@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ModuleCamera.h"
 #include "ModuleIMGUI.h"
 #include "ModuleWindow.h"
 #include "ModuleTriangle.h"
@@ -121,22 +122,37 @@ update_status ModuleInput::Update()
 			mouse_buttons[event.button.button - 1] = KEY_DOWN;
 			break;
 
+		case SDL_MOUSEMOTION:
+			if (event.button.state && SDL_BUTTON_RIGHT)
+			{
+				if (math::Abs(event.motion.xrel)>1)
+				{
+					//App->camera->RotateCam("Y", event.motion.xrel * 0.03);
+				}
+			}
+			break;
+
 		case SDL_MOUSEBUTTONUP:
 			mouse_buttons[event.button.button - 1] = KEY_UP;
 			break;
-		case SDL_MOUSEWHEEL_NORMAL:
-			mouse_buttons[event.button.button - 1] = KEY_DOWN;
-			break;
-		case SDL_MOUSEWHEEL_FLIPPED:
-			mouse_buttons[event.button.button - 1] = KEY_DOWN;
+		case SDL_MOUSEWHEEL:
+			if (SDL_MOUSEWHEEL_NORMAL)
+			{
+				App->camera->ZoomIn();
+			}
+			else
+			{
+				App->camera->ZoomOut();
+			}
+			/*mouse_buttons[event.button.button - 1] = KEY_DOWN;*/
 			break;
 
-		case SDL_MOUSEMOTION:
+		/*case SDL_MOUSEMOTION:
 			mouse_motion.x = event.motion.xrel / SCREEN_SIZE;
 			mouse_motion.y = event.motion.yrel / SCREEN_SIZE;
 			mouse.x = event.motion.x / SCREEN_SIZE;
 			mouse.y = event.motion.y / SCREEN_SIZE;
-			break;
+			break;*/
 		case SDL_DROPFILE:
 			App->model->meshes.clear();
 			App->imgui->AddLog("FILE DROPPED from:%s\n", event.drop.file);
@@ -144,19 +160,16 @@ update_status ModuleInput::Update()
 			if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "fbx")
 			{
 				App->imgui->AddLog("MODEL DROPPED from:%s\n", event.drop.file);
-				App->model->LoadModel(event.drop.file);
+				App->model->LoadModel(dropped_filedir.c_str());
 				for (unsigned int i = 0; i < App->model->meshes.size(); i++)
 				{
 					App->triangle->SetUpMesh(App->model->meshes[i]);
 				}
-				//App->program->LoadShader("default.vs", "default.fs");
 			}
 			else if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "png")
 			{
-				//App->texture->CleanUp();
 				App->imgui->AddLog("TEXTURE DROPPED from:%s\n", event.drop.file);
-				App->texture->LoadTexture(event.drop.file);
-				//App->program->LoadShader("default.vs", "default.fs");
+				App->texture->LoadTexture(dropped_filedir.c_str());
 			}
 			else
 			{

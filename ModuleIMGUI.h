@@ -24,6 +24,14 @@ public:
 	bool console_window = false;
 	bool about_window = false;
 	bool config_window = false;
+	bool window_info = false;
+	bool full_screen = false;
+	bool imgui_window = false;
+	bool input_window = false;
+	bool model_window = false;
+	bool program_window = false;
+	bool renderer_window = false;
+	bool texture_window = false;
 	bool quit = false;
 	bool git = false;
 	bool grid = true;

@@ -24,7 +24,9 @@ public:
 public:
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
-
+	Uint32 flags;
+	int width = SCREEN_WIDTH;
+	int height = SCREEN_HEIGHT;
 	//The surface contained by the window
 	SDL_Surface* screen_surface = NULL;
 };

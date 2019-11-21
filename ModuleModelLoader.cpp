@@ -13,6 +13,27 @@
 #include <assimp/IOSystem.hpp>
 #include <assimp/DefaultLogger.hpp>
 
+class myStream :
+	public LogStream
+{
+public:
+	// Constructor
+	myStream()
+	{
+		// empty
+	}
+
+	// Destructor
+	~myStream()
+	{
+		// empty
+	}
+	// Write womethink using your own functionality
+	void write(const char* message)
+	{
+		App->imgui->AddLog("ASSIMP INFO %s\n", message);
+	}
+};
 
 ModuleModelLoader::ModuleModelLoader()
 {
@@ -22,6 +43,18 @@ ModuleModelLoader::ModuleModelLoader()
 ModuleModelLoader::~ModuleModelLoader()
 {
 }
+void ModuleModelLoader::LogInfo(const std::string& pMessage)
+{
+	Assimp::DefaultLogger::get()->info(pMessage);
+	//App->imgui->AddLog(Assimp::DefaultLogger::get()->info(pMessage));
+
+}
+
+void ModuleModelLoader::LogError(const std::string& pMessage)
+{
+	Assimp::DefaultLogger::get()->error(pMessage);
+}
+
 
 void ModuleModelLoader::LoadModel(const char* path)
 {
@@ -30,16 +63,24 @@ void ModuleModelLoader::LoadModel(const char* path)
 	// Now I am ready for logging my stuff
 	DefaultLogger::get()->info("this is my info-call");
 	// Kill it after the work is done
-	DefaultLogger::kill();
+	const unsigned int severity = Logger::Debugging | Logger::Info | Logger::Err | Logger::Warn;
 	Assimp::Importer importer;
+	LogInfo("importer.ReadFile");
+	Assimp::DefaultLogger::get()->attachStream(new myStream(), severity);
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+	if (scene)
+	{
+		LogInfo("Import done");
+	}
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
-		LOG("ERROR::ASSIMP:: ", importer.GetErrorString());
+		App->imgui->AddLog("ERROR::ASSIMP:: ", importer.GetErrorString());
+		LogError("Error parsing file");
 		return;
 	}
 	directory = path;
 	processNode(scene->mRootNode, scene);
+	DefaultLogger::kill();
 }
 
 void ModuleModelLoader::processNode(aiNode* node, const aiScene* scene)
@@ -173,46 +214,46 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 			break;
 		}
-		if (skipToSourceFolder)
-		{   // if texture hasn't been loaded already, load it
-			Texture texture;
-			
-			fullPath =+ sourcePath;
-			fullPath =+"Baker_house.png";
-			App->imgui->AddLog(fullPath);
-			std::fstream file(fullPath);
-			if (!file)
-			{
-				App->imgui->AddLog("File does NOT exist in source folder path\n");
-				skipToMyFolder = true;
-			}
-			texture = App->texture->LoadTexture(fullPath);
-			App->imgui->AddLog("Seeking Texture source folder path: %s\n", fullPath);
-			//texture.path = str.C_Str();
-			texture.type = typeName;
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-			break;
-		}
-		if (skipToMyFolder)
-		{   // if texture hasn't been loaded already, load it
-			Texture texture;
-			fullPath2 =+ myTexturesPath;
-			fullPath2 =+"Baker_house.png";
-			App->imgui->AddLog(fullPath2);
-			std::fstream file(fullPath2);
-			if (file)
-			{
-				App->imgui->AddLog("Found File in my Textures folder path\n");
-			}
-			texture = App->texture->LoadTexture(myTexturesPath);
-			App->imgui->AddLog("Seeking Texture in my Textures path: %s\n", fullPath2);
-			
-			//texture.path = str.C_Str();
-			texture.type = typeName;
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-		}
+		//if (skipToSourceFolder)
+		//{   // if texture hasn't been loaded already, load it
+		//	Texture texture;
+		//	
+		//	fullPath =+ sourcePath;
+		//	fullPath =+"Baker_house.png";
+		//	App->imgui->AddLog(fullPath);
+		//	std::fstream file(fullPath);
+		//	if (!file)
+		//	{
+		//		App->imgui->AddLog("File does NOT exist in source folder path\n");
+		//		skipToMyFolder = true;
+		//	}
+		//	texture = App->texture->LoadTexture(fullPath);
+		//	App->imgui->AddLog("Seeking Texture source folder path: %s\n", fullPath);
+		//	//texture.path = str.C_Str();
+		//	texture.type = typeName;
+		//	textures.push_back(texture);
+		//	textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+		//	break;
+		//}
+		//if (skipToMyFolder)
+		//{   // if texture hasn't been loaded already, load it
+		//	Texture texture;
+		//	fullPath2 =+ myTexturesPath;
+		//	fullPath2 =+"Baker_house.png";
+		//	App->imgui->AddLog(fullPath2);
+		//	std::fstream file(fullPath2);
+		//	if (file)
+		//	{
+		//		App->imgui->AddLog("Found File in my Textures folder path\n");
+		//	}
+		//	texture = App->texture->LoadTexture(myTexturesPath);
+		//	App->imgui->AddLog("Seeking Texture in my Textures path: %s\n", fullPath2);
+		//	
+		//	//texture.path = str.C_Str();
+		//	texture.type = typeName;
+		//	textures.push_back(texture);
+		//	textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+		//}
 	}
 	return textures;
 }

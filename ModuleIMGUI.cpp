@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleModelLoader.h"
 #include "ModuleCamera.h"
 #include "SDL.h"
 #include "GL/glew.h"
@@ -67,9 +68,8 @@ update_status ModuleIMGUI::Update()
 	}
 	if (ImGui::BeginMenu("Tools"))
 	{
-		ImGui::MenuItem("Camera constrols Window", NULL, &show_another_window);
+		//ImGui::MenuItem("Camera constrols Window", NULL, &show_another_window);
 		ImGui::MenuItem("Console Window", NULL, &console_window);
-		ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
 		ImGui::MenuItem("Configurations Window", NULL, &config_window);
 		ImGui::EndMenu();
 	}
@@ -90,28 +90,6 @@ update_status ModuleIMGUI::Update()
 	{
 		ImGui::ShowDemoWindow(&show_demo_window);
 	}
-//		
-//	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-//	{
-//		static float f = 0.0f;
-//		static int counter = 0;
-//		ImGui::Begin("Main Window");
-//		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-//		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-//		ImGui::Checkbox("Camera constrols Window", &show_another_window);
-//		ImGui::Checkbox("Console Window", &console_window);
-//		ImGui::Checkbox("About Window", &about_window);
-//		//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-//		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-//		
-//		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-//			counter++;
-//		ImGui::SameLine();
-//		ImGui::Text("counter = %d", counter);
-//
-//		
-//		ImGui::End();
-//	}
 
 //Show Camera controls window.
 	if (show_another_window)
@@ -168,6 +146,26 @@ update_status ModuleIMGUI::Update()
 		ImGui::End();
 		
 	}
+	if (window_info)
+	{
+		ImGui::Begin("Our window info", &window_info);
+		ImGui::Text("Window width:", SDL_GetWindowSurface(App->window->window)->w);
+		ImGui::Text("Window width:", SDL_GetWindowSurface(App->window->window)->h);
+		ImGui::Checkbox("Set Full Screen", &full_screen);
+		if (full_screen)
+		{
+			SDL_WINDOW_FULLSCREEN;
+		}
+		ImGui::End();
+	}
+	if (model_window)
+	{
+		ImGui::Begin("Model info", &model_window);
+		ImGui::Text("Meshes Loaded:", App->model->meshes.size());
+		ImGui::Text("Textures Loaded:", App->model->textures_loaded.size());
+		ImGui::Checkbox("Set Full Screen", &full_screen);
+		ImGui::End();
+	}
 	// Show config window
 	if (config_window)
 	{
@@ -178,12 +176,20 @@ update_status ModuleIMGUI::Update()
 		if (fps_log.size() > 110) {
 			char title[25];
 			sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(310, 100));
+			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(350, 100));
 			fps_log.erase(fps_log.begin());
 		}
 		ImGui::Separator();
 		if (ImGui::TreeNode("Modules"))
 		{
+			ImGui::Checkbox("Window", &window_info);
+			ImGui::Checkbox("Camera", &show_another_window);
+			//ImGui::Checkbox("IMGUI", &imgui_window);
+			ImGui::Checkbox("Input", &input_window);
+			ImGui::Checkbox("Model", &model_window);
+			ImGui::Checkbox("Program", &program_window);
+			ImGui::Checkbox("Renderer", &renderer_window);
+			ImGui::Checkbox("Texture", &texture_window);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Libraries Configuration"))
