@@ -115,6 +115,12 @@ update_status ModuleInput::Update()
 			case SDL_WINDOWEVENT_RESTORED:
 				windowEvents[WE_SHOW] = true;
 				break;
+			case SDL_WINDOWEVENT_RESIZED:
+				App->window->Rescale(event.window.data1, event.window.data2);
+				break;
+			case SDL_WINDOWEVENT_SIZE_CHANGED:
+				App->window->Rescale(event.window.data1, event.window.data2);
+				break;
 			}
 			break;
 
@@ -122,39 +128,38 @@ update_status ModuleInput::Update()
 			mouse_buttons[event.button.button - 1] = KEY_DOWN;
 			break;
 
-		case SDL_MOUSEMOTION:
-			if (event.button.state && SDL_BUTTON_RIGHT)
-			{
-				if (math::Abs(event.motion.xrel)>1)
-				{
-					//App->camera->RotateCam("Y", event.motion.xrel * 0.03);
-				}
-			}
-			break;
+		//case SDL_MOUSEMOTION:
+		//	if (event.button.state && SDL_BUTTON_RIGHT)
+		//	{
+		//		if (math::Abs(event.motion.xrel)>1)
+		//		{
+		//			//App->camera->RotateCam("Y", event.motion.xrel * 0.03);
+		//		}
+		//	}
+		//	break;
 
 		case SDL_MOUSEBUTTONUP:
 			mouse_buttons[event.button.button - 1] = KEY_UP;
 			break;
 		case SDL_MOUSEWHEEL:
-			if (SDL_MOUSEWHEEL_NORMAL)
+			if (event.wheel.y > 0)
 			{
 				App->camera->ZoomIn();
 			}
-			else
+			else if (event.wheel.y < 0)
 			{
 				App->camera->ZoomOut();
 			}
 			/*mouse_buttons[event.button.button - 1] = KEY_DOWN;*/
 			break;
 
-		/*case SDL_MOUSEMOTION:
+		case SDL_MOUSEMOTION:
 			mouse_motion.x = event.motion.xrel / SCREEN_SIZE;
 			mouse_motion.y = event.motion.yrel / SCREEN_SIZE;
 			mouse.x = event.motion.x / SCREEN_SIZE;
 			mouse.y = event.motion.y / SCREEN_SIZE;
-			break;*/
+			break;
 		case SDL_DROPFILE:
-			App->model->meshes.clear();
 			App->imgui->AddLog("FILE DROPPED from:%s\n", event.drop.file);
 			dropped_filedir = event.drop.file;
 			if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "fbx")
@@ -168,8 +173,13 @@ update_status ModuleInput::Update()
 			}
 			else if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "png")
 			{
+				Mesh loadedMesh;
+				//loadedMesh = App->model->GetLoadedMesh();
+				//App->imgui->AddLog("TEXT LOADED BEFOR%d\n", App->model->);
 				App->imgui->AddLog("TEXTURE DROPPED from:%s\n", event.drop.file);
 				App->texture->LoadTexture(dropped_filedir.c_str());
+				App->imgui->AddLog("TEXT LOADED AFTER%d\n", App->model->textures_loaded.size());
+				
 			}
 			else
 			{
@@ -206,4 +216,6 @@ const iPoint& ModuleInput::GetMouseMotion() const
 {
 	return mouse_motion;
 }
+
+
 

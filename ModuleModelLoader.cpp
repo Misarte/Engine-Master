@@ -5,6 +5,7 @@
 #include <assimp/postprocess.h>
 #include "Application.h"
 #include "ModuleTexture.h"
+#include "ModuleInput.h"
 #include "ModuleIMGUI.h"
 #include <sys/stat.h>
 #include <fstream>
@@ -58,6 +59,7 @@ void ModuleModelLoader::LogError(const std::string& pMessage)
 
 void ModuleModelLoader::LoadModel(const char* path)
 {
+	meshes.clear();
 	// Create a logger instance 
 	DefaultLogger::create("", Logger::VERBOSE);
 	// Now I am ready for logging my stuff
@@ -106,6 +108,8 @@ Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
+		numVertices = mesh->mNumVertices;
+		//mesh.
 		Vertex vertex;
 		float3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
 		// positions
@@ -141,11 +145,14 @@ Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mBitangents[i].z;
 		vertex.Bitangent = vector;
 		loadedMesh.vertices.push_back(vertex);
+		modelPos = vector;
 	}
 	// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
+		numFaces = mesh->mNumFaces;
 		aiFace face = mesh->mFaces[i];
+		numIndices = face.mNumIndices;
 		// retrieve all indices of the face and store them in the indices vector
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			loadedMesh.indices.push_back(face.mIndices[j]);
@@ -175,6 +182,7 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
 	{
+		App->texture->CleanUp();
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		App->imgui->AddLog("Texture Name that should be loaded: %s\n", str.C_Str());
@@ -198,16 +206,16 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 			Texture texture;
 			texture = App->texture->LoadTexture(str.C_Str());
 			App->imgui->AddLog("Seeking Texture in fbx description path: %s\n", str.C_Str());
-			std::fstream file("Baker_house.png");
+			/*std::fstream file("Baker_house.png");
 			if (!file)
 			{
 				App->imgui->AddLog("File does NOT exist in fbx description path\n");
 				skipToSourceFolder = true;
-			}
-			if (file)
+			}*/
+			/*if (file)
 			{
 				App->imgui->AddLog("Found File in fbx description path\n");
-			}
+			}*/
 			//texture.path = str.C_Str();
 			texture.type = typeName;
 			textures.push_back(texture);
@@ -257,6 +265,8 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 	}
 	return textures;
 }
+
+
 
 
 

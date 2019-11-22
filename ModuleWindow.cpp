@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 #include "ModuleIMGUI.h"
+#include "ModuleCamera.h"
 
 ModuleWindow::ModuleWindow()
 {
@@ -55,6 +56,14 @@ bool ModuleWindow::Init()
 
 	return ret;
 }
+
+void ModuleWindow::Rescale(unsigned int newWidth, unsigned int newHeight)
+{
+	width = newWidth;
+	height = newHeight;
+	App->camera->SetAspectRatio();
+}
+
 
 // Called before quitting
 bool ModuleWindow::CleanUp()

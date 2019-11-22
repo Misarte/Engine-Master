@@ -29,6 +29,7 @@ public:
 	int height = SCREEN_HEIGHT;
 	//The surface contained by the window
 	SDL_Surface* screen_surface = NULL;
+	void Rescale(unsigned int newW, unsigned int newH);
 };
 
 #endif // __ModuleWindow_H__

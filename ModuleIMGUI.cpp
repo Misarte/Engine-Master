@@ -4,6 +4,7 @@
 #include "ModuleRender.h"
 #include "ModuleModelLoader.h"
 #include "ModuleCamera.h"
+#include "ModuleTexture.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include "imgui.h"
@@ -11,6 +12,7 @@
 #include "imgui_impl_sdl.h"
 #include "./IL/il.h"
 #include "Globals.h"
+#include "GL/glew.h"
 
 #include <string>
 #include <iostream>
@@ -70,6 +72,7 @@ update_status ModuleIMGUI::Update()
 	{
 		//ImGui::MenuItem("Camera constrols Window", NULL, &show_another_window);
 		ImGui::MenuItem("Console Window", NULL, &console_window);
+		ImGui::MenuItem("Properties", NULL, &properties_window);
 		ImGui::MenuItem("Configurations Window", NULL, &config_window);
 		ImGui::EndMenu();
 	}
@@ -104,7 +107,7 @@ update_status ModuleIMGUI::Update()
 			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -50.0f, 50.0f);
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Camera Rotation"))
+		if (ImGui::TreeNode("Camera Up-Front Vectors"))
 		{
 			ImGui::SliderFloat("Up-X", &(App->camera->frustum.up.x), -10.0f, 10.0f);
 			ImGui::SliderFloat("Up-Y", &(App->camera->frustum.up.y), -10.0f, 10.0f);
@@ -115,8 +118,12 @@ update_status ModuleIMGUI::Update()
 			ImGui::SliderFloat("Front-Z", &(App->camera->frustum.front.z), -10.0f, 10.0f);
 			ImGui::TreePop();
 		}
+		float fov = App->camera->frustum.verticalFov;
+		if (ImGui::SliderFloat("Vertical FOV", &fov, 0.01f, math::pi, "%.3f", 1.0f))
+		{
+			App->camera->SetFOV(fov);
+		}
 		
-		ImGui::Text("Keeping this to add any text!");
 		if (ImGui::Button("Close Me"))
 			show_another_window = false;
 		ImGui::End();
@@ -130,7 +137,44 @@ update_status ModuleIMGUI::Update()
 	{
 		App->camera->ShowAxis();
 	}
+	if (properties_window)
+	{
 
+		ImGui::Begin("Properities", &properties_window);
+		if (ImGui::TreeNode("Transformation"))
+		{
+			ImGui::Text("Position");
+			ImGui::Text("X %d", App->model->modelPos.x);
+			ImGui::SameLine();
+			ImGui::Text("Y %d", App->model->modelPos.y);
+			ImGui::SameLine();
+			ImGui::Text("Z %d", App->model->modelPos.z);
+			//ImGui::Value("X", App->model->modelPos);
+			ImGui::Text("Rotation");
+			ImGui::Text("Scale");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Geometry"))
+		{
+			ImGui::Text("Meshes Loaded: %d", App->model->meshes.size());
+			ImGui::Text("LoadedModel contains:");
+			ImGui::Text("Vertices: %d", App->model->numVertices);
+			ImGui::Text("Indices: %d", App->model->numIndices);
+			ImGui::Text("Faces: %d", App->model->numFaces);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Texture"))
+		{
+			ImGui::Text("Width: %d", App->texture->width);
+			ImGui::Text("Height: %d", App->texture->height);
+			ImGui::TreePop();
+		}
+		
+		if (ImGui::Button("Close Me"))
+			properties_window = false;
+		ImGui::End();
+
+	}
 //	//show console window
 	if (console_window)
 	{
@@ -149,21 +193,47 @@ update_status ModuleIMGUI::Update()
 	if (window_info)
 	{
 		ImGui::Begin("Our window info", &window_info);
-		ImGui::Text("Window width:", SDL_GetWindowSurface(App->window->window)->w);
-		ImGui::Text("Window width:", SDL_GetWindowSurface(App->window->window)->h);
+		ImGui::Text("Window width: %d", SDL_GetWindowSurface(App->window->window)->w);
+		ImGui::Text("Window width: %d", SDL_GetWindowSurface(App->window->window)->h);
 		ImGui::Checkbox("Set Full Screen", &full_screen);
 		if (full_screen)
 		{
 			SDL_WINDOW_FULLSCREEN;
 		}
+		if (ImGui::Button("Close Me"))
+			window_info = false;
 		ImGui::End();
 	}
-	if (model_window)
+	if (renderer_window)
 	{
-		ImGui::Begin("Model info", &model_window);
-		ImGui::Text("Meshes Loaded:", App->model->meshes.size());
-		ImGui::Text("Textures Loaded:", App->model->textures_loaded.size());
-		ImGui::Checkbox("Set Full Screen", &full_screen);
+		ImGui::Begin("Renderer info", &renderer_window);
+		ImGui::Text("Using Glew %s\n", glewGetString(GLEW_VERSION));
+		ImGui::Text("Vendor: %s\n", glGetString(GL_VENDOR));
+		ImGui::Text("Renderer: %s\n", glGetString(GL_RENDERER));
+		ImGui::Text("OpenGL version supported %s\n", glGetString(GL_VERSION));
+		ImGui::Text("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+		if (ImGui::Button("Close Me"))
+			renderer_window = false;
+		ImGui::End();
+	}
+	if (input_window)
+	{
+		ImGui::Begin("Inputs info", &input_window);
+		if (ImGui::Button("Close Me"))
+			console_window = false;
+		ImGui::End();
+	}
+	if (texture_window)
+	{
+		ImGui::Begin("Textures info", &texture_window);
+		ImGui::Text("Textures Loaded: %d", App->model->textures_loaded.size());
+		/*for (int i = 0; i < dirTextures.size(); i++)
+		{
+			ImGui::Checkbox("Texture:", &window_info);
+		}*/
+		
+		if (ImGui::Button("Close Me"))
+			texture_window = false;
 		ImGui::End();
 	}
 	// Show config window
@@ -186,8 +256,6 @@ update_status ModuleIMGUI::Update()
 			ImGui::Checkbox("Camera", &show_another_window);
 			//ImGui::Checkbox("IMGUI", &imgui_window);
 			ImGui::Checkbox("Input", &input_window);
-			ImGui::Checkbox("Model", &model_window);
-			ImGui::Checkbox("Program", &program_window);
 			ImGui::Checkbox("Renderer", &renderer_window);
 			ImGui::Checkbox("Texture", &texture_window);
 			ImGui::TreePop();
@@ -208,17 +276,9 @@ update_status ModuleIMGUI::Update()
 			ImGui::Separator();
 			const char* versionGL = (char *)(glGetString(GL_VERSION));
 			ImGui::Text("Glew Version: %s", versionGL);
-			/*ImGui::Separator();
-			const char* devil = (char *)(glGetString(GL_VERSION));
-			ImGui::Text("DevIL: %s", devil);*/
 			ImGui::Separator();
 			ImGui::Text("MathGeo Library");
-			/*std::string path = "/MathGeoLib/include/";
-			for (const auto & entry : fs::directory_iterator(path))
-			ImGui::Text("MathGeo File: %s");*/
-
 			ImGui::Separator();
-			//ILuint ilversion = iluGetInteger(ILU_VERSION_NUM);
 			ImGui::Text("DevIl Library");
 			ImGui::EndChildFrame();
 			ImGui::TreePop();

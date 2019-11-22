@@ -25,13 +25,22 @@ public:
 	void LoadModel(const char*);
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh processMesh(aiMesh*, const aiScene*);
+	std::vector<Texture> loadTextures(aiMaterial*, aiTextureType, char*);
 	const char* directory = nullptr;
 	const char* fullPath = nullptr;
 	const char* fullPath2 = nullptr;
 	const char* sourcePath = "./";
 	const char* myTexturesPath = "./Textures/Baker_house.png";
 
-	std::vector<Texture> loadTextures(aiMaterial* , aiTextureType, char*);
+	
+
+	Mesh theMesh;
+	float3 modelPos = {0, 0, 0};
+
+
+	int numVertices = 0;
+	int numIndices = 0;
+	int numFaces = 0;
 	//bool CleanUp();
 };
 

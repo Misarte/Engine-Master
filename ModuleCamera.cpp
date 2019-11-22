@@ -3,6 +3,8 @@
 #include "MathGeoLib.h"
 #include "ModuleInput.h"
 #include "ModuleIMGUI.h"
+#include "ModuleWindow.h"
+#include "ModuleModelLoader.h"
 #include "ModuleProgram.h"
 #include "Globals.h"
 #include "Application.h"
@@ -49,7 +51,7 @@ float4x4 ModuleCamera::LookAt(float3 eye, float3 target, float3 up) {
 }
 bool ModuleCamera::Init()
 {
-	float aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
+	aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	frustum.type = FrustumType::PerspectiveFrustum;
 	frustum.pos = float3(0.0f, 0.0f, 4.0f);
 	frustum.front = -float3::unitZ;
@@ -90,12 +92,21 @@ update_status ModuleCamera::Update()
 	if ((App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT))
 	{
 		speedCamera = speedCamera * 2;
-		App->imgui->AddLog("SPEED/n", speedCamera);
 	}
 	//While Right clicking, “WASD” fps-like movement and free look around must be enabled.
 	if (App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_RIGHT)) & SDL_BUTTON(3))
 	{
-		App->imgui->AddLog("MOUSE RIGHT CLICK\n");
+		float x = App->input->GetMouseMotion().x;
+		float y = App->input->GetMouseMotion().y;
+		RotateCam(-x * rotSpeed, -y * rotSpeed);
+		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+		{
+			frustum.pos += speedCamera * frustum.up;
+		}
+		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
+		{
+			frustum.pos -= speedCamera * frustum.up;
+		}
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 		{
 			frustum.pos += speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
@@ -103,7 +114,6 @@ update_status ModuleCamera::Update()
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 		{
 			frustum.pos -= speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
-			//App->camera->frustum.pos.Normalize();
 		}
 		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 		{
@@ -113,17 +123,20 @@ update_status ModuleCamera::Update()
 		{
 			frustum.pos -= speedCamera * frustum.front;
 		}
-		
-		if (App->input->GetMouseMotion().x )
+		if (App->input->GetKey(SDL_SCANCODE_F))
 		{
-			App->camera->frustum.pos += App->camera->frustum.up.Cross(App->camera->frustum.up);
-			//App->input->GetMouseMotion();
+			Focus(App->model->modelPos);
 		}
-		////if (App->input->Get)
-		//{
-		//	App->camera->frustum.pos += App->camera->frustum.up.Cross(App->camera->frustum.up);
-		//	//App->input->GetMouseMotion();
-		//}
+	}
+	else
+	{
+		RotateCam(0.0f, 0.0f);
+	}
+	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT & App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_LEFT)))
+	{
+		float xR = App->input->GetMouseMotion().x;
+		float yR = App->input->GetMouseMotion().y;
+		OrbitCam(-xR * rotSpeed, -yR * rotSpeed);
 	}
 	return UPDATE_CONTINUE;
 }
@@ -136,36 +149,61 @@ void ModuleCamera::ZoomOut()
 {
 	frustum.pos -= speedCamera * frustum.front;
 }
-//void MooveCam(Axis xyz)
-//{
-//	switch (xyz)
-//	{
-//	case X:
-//		break;
-//	case Y:
-//		break;
-//	case Z:
-//		break;
-//	}
-//}
-/*void RotateCam(const char* axis, float move) 
+
+void ModuleCamera::RotateCam(const float xAxis, const float yAxis)
 {
-	if (axis == "X")
+	if (xAxis!= 0.0f)
 	{
+		float3x3 rotY = float3x3::RotateY(xAxis);
+		frustum.front = rotY.Transform(frustum.front).Normalized();
+		frustum.up = rotY.Transform(frustum.up).Normalized();
+	}
+	if (yAxis != 0.0f)
+	{
+		float3x3 rotX = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
+		frustum.up = rotX.Transform(frustum.up).Normalized();
+		frustum.front = rotX.Transform(frustum.front).Normalized();
+	}
+	
+}
+void ModuleCamera::OrbitCam(const float xAxis, const float yAxis)
+{
+	if (xAxis != 0.0f)
+	{
+		float3x3 rot = float3x3::RotateY(xAxis);
+		frustum.pos = rot.Transform(frustum.pos - App->model->modelPos) + App->model->modelPos;
+	}
+	if (yAxis != 0.0f)
+	{
+		float3x3 rot = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
+		frustum.pos = rot.Transform(frustum.pos - App->model->modelPos) + App->model->modelPos;
+	}
+	LookAt(frustum.pos, App->model->modelPos, frustum.up);
+	view = frustum.ViewMatrix();
+}
 
-	}
-	if (axis == "Y")
-	{
-		App->camera->rotation = float3x3::RotateY(move * App->camera->speedCamera);
-		App->camera->frustum.up = App->camera->rotation * App->camera->frustum.up;
-		App->camera->frustum.front = App->camera->rotation * App->camera->frustum.front;
+void ModuleCamera::SetFOV(float fov)
+{
+	frustum.verticalFov = fov;
+	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) *aspect);
+	proj = frustum.ProjectionMatrix();
+}
+void ModuleCamera::SetAspectRatio()
+{
+	aspect = ((float)App->window->width / App->window->height);
+	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) *aspect);
+	proj = frustum.ProjectionMatrix();
+}
 
-	}
-	if (axis == "Z")
-	{
-		const float angle = asinf(App->camera->frustum.front.y / App->camera->frustum.front.Length());
-	}
-}*/
+void ModuleCamera::Focus(const float3& fPos)
+{
+	frustum.pos = fPos;
+	frustum.front = -float3::unitZ;
+	frustum.up = float3::unitY;
+	LookAt(frustum.pos, App->model->modelPos, frustum.up);
+	view = frustum.ViewMatrix();
+}
+
 void ModuleCamera::ShowGrid()
 {
 	glLineWidth(1.0f);
