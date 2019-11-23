@@ -51,7 +51,6 @@ float4x4 ModuleCamera::LookAt(float3 eye, float3 target, float3 up) {
 }
 bool ModuleCamera::Init()
 {
-	aspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	frustum.type = FrustumType::PerspectiveFrustum;
 	frustum.pos = float3(0.0f, 0.0f, 4.0f);
 	frustum.front = -float3::unitZ;
@@ -59,24 +58,14 @@ bool ModuleCamera::Init()
 	frustum.nearPlaneDistance = 0.1f;
 	frustum.farPlaneDistance = 100.0f;
 	frustum.verticalFov = math::pi / 4.0f;
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * aspect);
-	
-
-	float4x4 transform = proj * view * float4x4(model);
-
-	float4 v1 = transform * float4(-1.0f, -1.0f, 0.0f, 1.0f);
-	float4 v2 = transform * float4(1.0f, -1.0f, 0.0f, 1.0f);
-	float4 v3 = transform * float4(0.0f, 1.0f, 0.0f, 1.0f);
-
-	v1 = v1 / v1.w;
-	v2 = v2 / v2.w;
-	v3 = v3 / v3.w;
-	
+	SetAspectRatio();
+	RecalculateRot(frustum.front);
 	return true;
 }
 
 update_status ModuleCamera::PreUpdate()
 {
+	SetAspectRatio();
 	proj = frustum.ProjectionMatrix();
 
 	model = float4x4::FromTRS(float3(0.0f, 0.0f, -4.0f),
@@ -88,6 +77,8 @@ update_status ModuleCamera::PreUpdate()
 }
 update_status ModuleCamera::Update()
 {
+	yaw = 0.0f;
+	pitch = 0.0f;
 	speedCamera = SPEED_CAM;
 	if ((App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT))
 	{
@@ -96,9 +87,8 @@ update_status ModuleCamera::Update()
 	//While Right clicking, “WASD” fps-like movement and free look around must be enabled.
 	if (App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_RIGHT)) & SDL_BUTTON(3))
 	{
-		float x = App->input->GetMouseMotion().x;
-		float y = App->input->GetMouseMotion().y;
-		RotateCam(-x * rotSpeed, -y * rotSpeed);
+		RotateCam();
+		//RotateCam(yaw * rotSpeed, pitch * rotSpeed);
 		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 		{
 			frustum.pos += speedCamera * frustum.up;
@@ -123,20 +113,28 @@ update_status ModuleCamera::Update()
 		{
 			frustum.pos -= speedCamera * frustum.front;
 		}
-		if (App->input->GetKey(SDL_SCANCODE_F))
-		{
-			Focus(App->model->modelPos);
-		}
 	}
 	else
 	{
-		RotateCam(0.0f, 0.0f);
+		//RotateCam(0.0f, 0.0f);
 	}
 	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT & App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_LEFT)))
 	{
 		float xR = App->input->GetMouseMotion().x;
 		float yR = App->input->GetMouseMotion().y;
-		OrbitCam(-xR * rotSpeed, -yR * rotSpeed);
+		yaw += xR;
+		pitch += yR;
+
+		float3 dir;
+		dir.x = cos(DegToRad(yaw)) * cos(DegToRad(pitch));
+		dir.y = sin(DegToRad(pitch));
+		dir.z = sin(DegToRad(pitch)) * cos(DegToRad(pitch));
+		frustum.pos = App->model->boundingBox.CenterPoint() - App->model->boundingBox.Size().Normalize() * frustum.front;
+		frustum.front = dir.Normalized();
+	}
+	if (App->input->GetKey(SDL_SCANCODE_F))
+	{
+		Focus();
 	}
 	return UPDATE_CONTINUE;
 }
@@ -150,58 +148,69 @@ void ModuleCamera::ZoomOut()
 	frustum.pos -= speedCamera * frustum.front;
 }
 
-void ModuleCamera::RotateCam(const float xAxis, const float yAxis)
+void ModuleCamera::RotateCam()
 {
-	if (xAxis!= 0.0f)
-	{
-		float3x3 rotY = float3x3::RotateY(xAxis);
-		frustum.front = rotY.Transform(frustum.front).Normalized();
-		frustum.up = rotY.Transform(frustum.up).Normalized();
-	}
-	if (yAxis != 0.0f)
-	{
-		float3x3 rotX = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
-		frustum.up = rotX.Transform(frustum.up).Normalized();
-		frustum.front = rotX.Transform(frustum.front).Normalized();
-	}
-	
+	float2 move = App->input->GetMouseMotion();
+
+	move.x *= rotSpeed;
+	move.y *= rotSpeed;
+
+	yaw += move.x;
+	pitch += move.y;
+
+	float3 dir;
+	dir.x = cos(DegToRad(yaw)) * cos(DegToRad(pitch));
+	dir.y = sin(DegToRad(pitch));
+	dir.z = sin(DegToRad(yaw)) * cos(DegToRad(pitch));
+
+	frustum.front = dir.Normalized();
+	//if (xAxis!= 0.0f)
+	//{
+	//	float3x3 rotY = float3x3::RotateY(xAxis);
+	//	frustum.front = rotY.Transform(frustum.front).Normalized();
+	//	frustum.up = rotY.Transform(frustum.up).Normalized();
+	//}
+	//if (yAxis != 0.0f)
+	//{
+	//	float3x3 rotX = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
+	//	frustum.up = rotX.Transform(frustum.up).Normalized();
+	//	frustum.front = rotX.Transform(frustum.front).Normalized();
+	//}
 }
 void ModuleCamera::OrbitCam(const float xAxis, const float yAxis)
 {
 	if (xAxis != 0.0f)
 	{
-		float3x3 rot = float3x3::RotateY(xAxis);
-		frustum.pos = rot.Transform(frustum.pos - App->model->modelPos) + App->model->modelPos;
+		float3x3 rot = float3x3::RotateY(centerOffset.z * xAxis);
+		frustum.pos = rot.Transform(frustum.pos);
+		frustum.front = rot.Transform(frustum.front).Normalized();
+		
 	}
 	if (yAxis != 0.0f)
 	{
-		float3x3 rot = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
-		frustum.pos = rot.Transform(frustum.pos - App->model->modelPos) + App->model->modelPos;
+		float3x3 rot = float3x3::RotateX(centerOffset.z * yAxis);
+		frustum.pos = rot.Transform(frustum.pos);
+		frustum.front = rot.Transform(frustum.front).Normalized();
 	}
 	LookAt(frustum.pos, App->model->modelPos, frustum.up);
+	proj = frustum.ProjectionMatrix();
 	view = frustum.ViewMatrix();
 }
 
 void ModuleCamera::SetFOV(float fov)
 {
 	frustum.verticalFov = fov;
-	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) *aspect);
+	SetAspectRatio();
 	proj = frustum.ProjectionMatrix();
 }
 void ModuleCamera::SetAspectRatio()
 {
-	aspect = ((float)App->window->width / App->window->height);
-	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) *aspect);
-	proj = frustum.ProjectionMatrix();
+	frustum.horizontalFov = 2.0f * atanf(tanf(frustum.verticalFov * 0.5f) * ((float)App->window->width / App->window->height));
 }
 
-void ModuleCamera::Focus(const float3& fPos)
+void ModuleCamera::Focus()
 {
-	frustum.pos = fPos;
-	frustum.front = -float3::unitZ;
-	frustum.up = float3::unitY;
-	LookAt(frustum.pos, App->model->modelPos, frustum.up);
-	view = frustum.ViewMatrix();
+	frustum.pos = App->model->boundingBox.CenterPoint() - App->model->boundingBox.Size().Normalize() * frustum.front;
 }
 
 void ModuleCamera::ShowGrid()
@@ -261,4 +270,10 @@ update_status ModuleCamera::PostUpdate()
 bool ModuleCamera::CleanUp()
 {
 	return true;
+}
+
+void ModuleCamera::RecalculateRot(float3& vec)
+{
+	pitch = RadToDeg(asin(vec.y));
+	yaw = RadToDeg(acos(vec.x / cos(DegToRad(pitch))));
 }

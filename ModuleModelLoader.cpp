@@ -7,7 +7,9 @@
 #include "ModuleTexture.h"
 #include "ModuleInput.h"
 #include "ModuleIMGUI.h"
+#include "ModuleCamera.h"
 #include <sys/stat.h>
+#include <io.h>
 #include <fstream>
 #include <iostream>
 #include <assimp/IOStream.hpp>
@@ -35,11 +37,9 @@ public:
 		App->imgui->AddLog("ASSIMP INFO %s\n", message);
 	}
 };
-
 ModuleModelLoader::ModuleModelLoader()
 {
 }
-
 
 ModuleModelLoader::~ModuleModelLoader()
 {
@@ -55,7 +55,6 @@ void ModuleModelLoader::LogError(const std::string& pMessage)
 {
 	Assimp::DefaultLogger::get()->error(pMessage);
 }
-
 
 void ModuleModelLoader::LoadModel(const char* path)
 {
@@ -100,11 +99,13 @@ void ModuleModelLoader::processNode(aiNode* node, const aiScene* scene)
 	{
 		processNode(node->mChildren[i], scene);
 	}
+	App->camera->Focus();
 }
 
 Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 {
 	Mesh loadedMesh;
+	boundingBox = { float3::zero, float3::zero };
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -117,6 +118,34 @@ Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.y = mesh->mVertices[i].y;
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
+		if (vector.x > boundingBox.maxPoint.x)
+		{
+			boundingBox.maxPoint.x = vector.x;
+		}
+		if ((vector.y > vector.x) & (vector.y > boundingBox.maxPoint.y))
+		{
+			boundingBox.maxPoint.y = vector.y;
+		}
+		if ((vector.z > vector.x) & (vector.z > vector.z) & (vector.z > boundingBox.maxPoint.z))
+		{
+			boundingBox.maxPoint.z = vector.z;
+		}
+		//===========,==================================================================================
+		if (vector.x < boundingBox.minPoint.x)
+		{
+			boundingBox.minPoint.x = vector.x;
+		}
+		if ((vector.y < vector.x) & (vector.y < boundingBox.minPoint.y))
+		{
+			boundingBox.minPoint.y = vector.y;
+		}
+		if ((vector.z < vector.x) & (vector.z < vector.z) & (vector.z < boundingBox.minPoint.z))
+		{
+			boundingBox.minPoint.z = vector.z;
+		}
+		//===========,==================================================================================
+		
+		//boundingBox.Enclose(boundingBox., mesh->mNumVertices);
 		// normals
 		vector.x = mesh->mNormals[i].x;
 		vector.y = mesh->mNormals[i].y;
@@ -145,7 +174,7 @@ Mesh ModuleModelLoader::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mBitangents[i].z;
 		vertex.Bitangent = vector;
 		loadedMesh.vertices.push_back(vertex);
-		modelPos = vector;
+		//modelPos = vector - maxRadius;
 	}
 	// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -187,83 +216,51 @@ std::vector<Texture> ModuleModelLoader::loadTextures(aiMaterial* mat, aiTextureT
 		mat->GetTexture(type, i, &str);
 		App->imgui->AddLog("Texture Name that should be loaded: %s\n", str.C_Str());
 		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-		bool skip = false;
-		bool skipToSourceFolder = false;
-		bool skipToMyFolder = false;
-		for (unsigned int j = 0; j < textures_loaded.size(); j++)
+		 // if texture hasn't been loaded already, load it
+		if (FileExists(str.C_Str()))
 		{
-			if (std::strcmp(textures_loaded[j].path, str.C_Str()) == 0)
+			App->imgui->AddLog("Texture loading from: %s\n", str.C_Str());
+			finalPath = str.C_Str();
+		}
+		else if (FileExists(modelPath.c_str()))
+		{
+			modelPath.append(str.C_Str());
+			App->imgui->AddLog("Texture loading from Models Path: %s\n", modelPath.c_str());
+			finalPath = modelPath.c_str();
+		}
+		else
+		{
+			myTexturesPath.append(str.C_Str());
+			if (FileExists(myTexturesPath.c_str()))
 			{
-				App->imgui->AddLog("Texture was loaded from fbx description path: %s\n", textures_loaded[j].path);
-				textures.push_back(textures_loaded[j]);
-				//myTexturesPath = str.C_Str().append("Textures/");
-				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
-				break;
+				App->imgui->AddLog("Texture loading from Textures Path: %s\n", myTexturesPath.c_str());
+				finalPath = myTexturesPath.c_str();
 			}
 		}
-		if (!skip)
-		{   // if texture hasn't been loaded already, load it
-			Texture texture;
-			texture = App->texture->LoadTexture(str.C_Str());
-			App->imgui->AddLog("Seeking Texture in fbx description path: %s\n", str.C_Str());
-			/*std::fstream file("Baker_house.png");
-			if (!file)
-			{
-				App->imgui->AddLog("File does NOT exist in fbx description path\n");
-				skipToSourceFolder = true;
-			}*/
-			/*if (file)
-			{
-				App->imgui->AddLog("Found File in fbx description path\n");
-			}*/
-			//texture.path = str.C_Str();
-			texture.type = typeName;
-			textures.push_back(texture);
-			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-			break;
-		}
-		//if (skipToSourceFolder)
-		//{   // if texture hasn't been loaded already, load it
-		//	Texture texture;
-		//	
-		//	fullPath =+ sourcePath;
-		//	fullPath =+"Baker_house.png";
-		//	App->imgui->AddLog(fullPath);
-		//	std::fstream file(fullPath);
-		//	if (!file)
-		//	{
-		//		App->imgui->AddLog("File does NOT exist in source folder path\n");
-		//		skipToMyFolder = true;
-		//	}
-		//	texture = App->texture->LoadTexture(fullPath);
-		//	App->imgui->AddLog("Seeking Texture source folder path: %s\n", fullPath);
-		//	//texture.path = str.C_Str();
-		//	texture.type = typeName;
-		//	textures.push_back(texture);
-		//	textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-		//	break;
-		//}
-		//if (skipToMyFolder)
-		//{   // if texture hasn't been loaded already, load it
-		//	Texture texture;
-		//	fullPath2 =+ myTexturesPath;
-		//	fullPath2 =+"Baker_house.png";
-		//	App->imgui->AddLog(fullPath2);
-		//	std::fstream file(fullPath2);
-		//	if (file)
-		//	{
-		//		App->imgui->AddLog("Found File in my Textures folder path\n");
-		//	}
-		//	texture = App->texture->LoadTexture(myTexturesPath);
-		//	App->imgui->AddLog("Seeking Texture in my Textures path: %s\n", fullPath2);
-		//	
-		//	//texture.path = str.C_Str();
-		//	texture.type = typeName;
-		//	textures.push_back(texture);
-		//	textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
-		//}
+		Texture texture;
+		texture = App->texture->LoadTexture(finalPath.c_str());
+		texture.type = typeName;
+		textures.push_back(texture);
 	}
 	return textures;
+}
+void ModuleModelLoader::UpdateTexture(Texture& textToUpdate)
+{
+	for (int i = 0; i < App->model->meshes.size(); i++)
+	{
+		meshes[i].textures.clear();
+		meshes[i].textures.push_back(textToUpdate);
+	}
+}
+
+bool ModuleModelLoader::FileExists(const char* path)
+{
+	if (access(path, 0) == -1)
+	{
+		App->imgui->AddLog("File does NOT exist in path %s:\n", path);
+		return false;
+	}
+	return true;
 }
 
 

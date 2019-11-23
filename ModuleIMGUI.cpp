@@ -144,14 +144,16 @@ update_status ModuleIMGUI::Update()
 		if (ImGui::TreeNode("Transformation"))
 		{
 			ImGui::Text("Position");
-			ImGui::Text("X %d", App->model->modelPos.x);
+			ImGui::Text("X: %d", App->model->modelPos.x);
 			ImGui::SameLine();
-			ImGui::Text("Y %d", App->model->modelPos.y);
+			ImGui::Text("Y: %d", App->model->modelPos.y);
 			ImGui::SameLine();
-			ImGui::Text("Z %d", App->model->modelPos.z);
+			ImGui::Text("Z: %d", App->model->modelPos.z);
 			//ImGui::Value("X", App->model->modelPos);
 			ImGui::Text("Rotation");
-			ImGui::Text("Scale");
+			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().x);
+			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().y);
+			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().z);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Geometry"))
@@ -160,33 +162,40 @@ update_status ModuleIMGUI::Update()
 			ImGui::Text("LoadedModel contains:");
 			ImGui::Text("Vertices: %d", App->model->numVertices);
 			ImGui::Text("Indices: %d", App->model->numIndices);
-			ImGui::Text("Faces: %d", App->model->numFaces);
+			ImGui::Text("Faces/Triangles: %d", App->model->numFaces);
+			ImGui::Text("Center: %d", App->model->centerPoint);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Texture"))
 		{
 			ImGui::Text("Width: %d", App->texture->width);
 			ImGui::Text("Height: %d", App->texture->height);
+			for (unsigned int i=0; i<App->texture->textures_loaded.size(); i++)
+			{
+				if (ImGui::ImageButton((void*)(intptr_t)App->texture->textures_loaded[i].id, ImVec2(128,128)))
+				{
+					App->model->UpdateTexture(App->texture->textures_loaded[i]);
+				}
+			}
 			ImGui::TreePop();
 		}
 		
 		if (ImGui::Button("Close Me"))
 			properties_window = false;
 		ImGui::End();
-
 	}
 //	//show console window
 	if (console_window)
 	{
-		ScrollToBottom = true;
+		//ScrollToBottom = true;
 		//Buf  = SDL_LOG
 		ImGui::Begin("Console window", &console_window);
 		ImGui::TextUnformatted(Buf.begin());
 		if (ScrollToBottom)
 			ImGui::SetScrollHere(1.0f);
 		ScrollToBottom = false;
-		if (ImGui::Button("Close Me"))
-			console_window = false;
+		/*if (ImGui::Button("Close Me"))
+			console_window = false;*/
 		ImGui::End();
 		
 	}
@@ -198,7 +207,7 @@ update_status ModuleIMGUI::Update()
 		ImGui::Checkbox("Set Full Screen", &full_screen);
 		if (full_screen)
 		{
-			SDL_WINDOW_FULLSCREEN;
+			SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 		if (ImGui::Button("Close Me"))
 			window_info = false;
@@ -226,7 +235,7 @@ update_status ModuleIMGUI::Update()
 	if (texture_window)
 	{
 		ImGui::Begin("Textures info", &texture_window);
-		ImGui::Text("Textures Loaded: %d", App->model->textures_loaded.size());
+		ImGui::Text("Textures Loaded: %d", App->texture->textures_loaded.size());
 		/*for (int i = 0; i < dirTextures.size(); i++)
 		{
 			ImGui::Checkbox("Texture:", &window_info);

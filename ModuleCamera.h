@@ -37,16 +37,20 @@ public:
 	float4x4 proj;
 	float4x4 model;
 	float4x4 view;
-	float aspect = 1.0f;
-	float rotSpeed = 0.02f;;
+	float rotSpeed = 0.02f;
+	float rotOffset = 0.0f;
 	float speedCamera = SPEED_CAM;
 	float distance;
-
-	void RotateCam(const float xAxis, const float yAxis);
+	float dz = 2.0f;
+	float3 centerOffset = {0, 0, 0};
+	float offset = 3.0f ;
+	void RotateCam();
 	void OrbitCam(const float xAxis, const float yAxis);
-	void Focus(const float3& fPos);
+	void Focus();
 	void SetFOV(float fov);
 	void SetAspectRatio();
+	void RecalculateRot(float3& vec);
+	float yaw = 0.0f, pitch = 0.0f;
 	/*float3 cameraPos = App->camera->frustum.pos;
 	float3 cameraUp = math::float3(0.0f, 1.0f, 0.0f);
 	float3 cameraFront = math::float3(0.0f, -1.0f, -4.0f);*/

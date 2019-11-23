@@ -50,15 +50,15 @@ public:
 	// Check for window events last frame
 	bool GetWindowEvent(EventWindow code) const;
 	// Get mouse / axis position
-	const iPoint& GetMouseMotion() const;
-	const iPoint& GetMousePosition() const;
+	const float2& GetMouseMotion() const;
+	const float2& GetMousePosition() const;
 	std::string dropped_filedir;
 private:
 	bool windowEvents[WE_COUNT];
 	KeyState* keyboard = NULL;
 	KeyState mouse_buttons[NUM_MOUSE_BUTTONS];
-	iPoint mouse_motion;
-	iPoint mouse;
+	float2 mouse_motion;
+	float2 mouse;
 	
 //private:
 //	const Uint8 *keyboard = NULL;

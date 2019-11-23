@@ -15,6 +15,7 @@ public:
 
 	Texture LoadTexture(const char*);
 	Texture texture;
+	std::vector<Texture> textures_loaded;
 	bool loaded = NULL;
 	int width, height, nrChannels;
 	ILuint imageName;

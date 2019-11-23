@@ -127,17 +127,6 @@ update_status ModuleInput::Update()
 		case SDL_MOUSEBUTTONDOWN:
 			mouse_buttons[event.button.button - 1] = KEY_DOWN;
 			break;
-
-		//case SDL_MOUSEMOTION:
-		//	if (event.button.state && SDL_BUTTON_RIGHT)
-		//	{
-		//		if (math::Abs(event.motion.xrel)>1)
-		//		{
-		//			//App->camera->RotateCam("Y", event.motion.xrel * 0.03);
-		//		}
-		//	}
-		//	break;
-
 		case SDL_MOUSEBUTTONUP:
 			mouse_buttons[event.button.button - 1] = KEY_UP;
 			break;
@@ -173,12 +162,14 @@ update_status ModuleInput::Update()
 			}
 			else if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "png")
 			{
-				Mesh loadedMesh;
-				//loadedMesh = App->model->GetLoadedMesh();
-				//App->imgui->AddLog("TEXT LOADED BEFOR%d\n", App->model->);
 				App->imgui->AddLog("TEXTURE DROPPED from:%s\n", event.drop.file);
-				App->texture->LoadTexture(dropped_filedir.c_str());
-				App->imgui->AddLog("TEXT LOADED AFTER%d\n", App->model->textures_loaded.size());
+				Texture text = App->texture->LoadTexture(dropped_filedir.c_str());
+				//App->imgui->AddLog("TEXT LOADED AFTER%d\n", App->model->textures_loaded.size());
+				for (int i=0; i< App->model->meshes.size(); i++)
+				{
+					App->model->meshes[i].textures.clear();
+					App->model->meshes[i].textures.push_back(text);
+				}
 				
 			}
 			else
@@ -207,12 +198,12 @@ bool ModuleInput::GetWindowEvent(EventWindow ev) const
 	return windowEvents[ev];
 }
 
-const iPoint& ModuleInput::GetMousePosition() const
+const float2& ModuleInput::GetMousePosition() const
 {
 	return mouse;
 }
 
-const iPoint& ModuleInput::GetMouseMotion() const
+const float2& ModuleInput::GetMouseMotion() const
 {
 	return mouse_motion;
 }

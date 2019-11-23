@@ -29,10 +29,16 @@ bool ModuleWindow::Init()
 		//Create window
 		
 		flags = SDL_WINDOW_SHOWN |  SDL_WINDOW_OPENGL;
+		SDL_DisplayMode disMode;
+		SDL_GetCurrentDisplayMode(0, &disMode);
+		disScreenWidthMax = disMode.w;
+		disScreenHeightMax = disMode.w;
+		disScreenWidthMin = width =  disMode.w / aspect;
+		disScreenHeightMin = height = disMode.h / aspect;
 
 		if(FULLSCREEN == true)
 		{
-			flags |= SDL_WINDOW_FULLSCREEN;
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 		if (RESIZABLE == true)
 		{
@@ -61,7 +67,6 @@ void ModuleWindow::Rescale(unsigned int newWidth, unsigned int newHeight)
 {
 	width = newWidth;
 	height = newHeight;
-	App->camera->SetAspectRatio();
 }
 
 

@@ -91,11 +91,11 @@ void ModuleTriangle::SetUpMesh(Mesh mesh)
 }
 
 bool ModuleTriangle::Init() {
-	/*App->model->LoadModel("BakerHouse.fbx");
+	App->model->LoadModel("Models/BakerHouse.fbx");
 	for (unsigned int i = 0; i< App->model->meshes.size(); i++) 
 	{
 		SetUpMesh(App->model->meshes[i]);
-	}*/
+	}
 	App->program->LoadShader("default.vs", "default.fs");
 	return true;
 }
