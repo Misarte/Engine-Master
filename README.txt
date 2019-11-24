@@ -20,8 +20,13 @@ Instructions:
 -Load 2D Textures in .png format.
 
 -Visualize!
+
+-Check Model with Camera Controls.
+
+-Modify Model with Mouse Drag&Drop other .png Texture/IMGUI Controls(Checkers.png Texture Option, LoadedTexture Option).
+-Modify Window with Mouse Resize/IMGUI Window controls(Tools/Configuration Window/Modules/Window)
 ====================================================================================
-Controls:
+-----------------------------------------------Controls:-----------------------------------------------
 
 Key Inputs
 -> Window Controls
@@ -60,7 +65,7 @@ IMGUI Inputs
 -----Modules - Camera - Adjust Position/Up-Front Vectors Sliders.
 -----Modules - Camera - Adjust FOV Slider.
 
-IMGUI Info
+-----------------------------------------------IMGUI Info:-----------------------------------------------
 ->Main Menu
 ---Demo Window - Shows Demo Window of IMGUI library.
 ---About Window - Show About info regarding the Application Game Engine.
