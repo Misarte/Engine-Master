@@ -4,6 +4,7 @@
 #include "ModuleInput.h"
 #include "ModuleIMGUI.h"
 #include "ModuleWindow.h"
+#include "ModuleRender.h"
 #include "ModuleModelLoader.h"
 #include "ModuleProgram.h"
 #include "Globals.h"
@@ -82,79 +83,91 @@ update_status ModuleCamera::Update()
 	speedCamera = SPEED_CAM;
 	if ((App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT) || (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT))
 	{
+		App->imgui->AddLogInput("Input: Left/Right Shift Keyboard\n");
 		speedCamera = speedCamera * 2;
 	}
 	//While Right clicking, “WASD” fps-like movement and free look around must be enabled.
 	if (App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_RIGHT)) & SDL_BUTTON(3))
 	{
-		RotateCam();
-		//RotateCam(yaw * rotSpeed, pitch * rotSpeed);
+		//RotateCam();
+		App->imgui->AddLogInput("Input: Right Mouse\n");
+		float2 move = App->input->GetMouseMotion();
+		yaw = move.x;
+		pitch = move.y;
+
+		RotateCam(yaw * rotSpeed, pitch * rotSpeed);
 		if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
 		{
+			App->imgui->AddLogInput("Input: Q Keyboard\n");
 			frustum.pos += speedCamera * frustum.up;
 		}
 		if (App->input->GetKey(SDL_SCANCODE_E) == KEY_REPEAT)
 		{
 			frustum.pos -= speedCamera * frustum.up;
+			App->imgui->AddLogInput("Input: E Keyboard\n");
 		}
 		if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
 		{
 			frustum.pos += speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
+			App->imgui->AddLogInput("Input: D Keyboard\n");
 		}
 		if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
 		{
 			frustum.pos -= speedCamera * (frustum.front.Cross(frustum.up)).Normalized();
+			App->imgui->AddLogInput("Input: A Keyboard\n");
 		}
 		if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
 		{
 			frustum.pos += speedCamera * frustum.front;
+			App->imgui->AddLogInput("Input: W Keyboard\n");
 		}
 		if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
 		{
 			frustum.pos -= speedCamera * frustum.front;
+			App->imgui->AddLogInput("Input: S Keyboard\n");
 		}
 	}
 	else
 	{
-		//RotateCam(0.0f, 0.0f);
+		RotateCam(0.0f, 0.0f);
 	}
 	if (App->input->GetKey(SDL_SCANCODE_LALT) == KEY_REPEAT & App->input->GetMouseButtonDown(SDL_BUTTON(SDL_BUTTON_LEFT)))
 	{
-		float xR = App->input->GetMouseMotion().x;
-		float yR = App->input->GetMouseMotion().y;
-		yaw += xR;
-		pitch += yR;
+		App->imgui->AddLogInput("Input: Left ALT Keyboard & Left Mouse\n");
+		float2 move = App->input->GetMouseMotion();
+		yaw = move.x;
+		pitch = move.y;
 
-		float3 dir;
+		OrbitCam(yaw * rotSpeed, pitch * rotSpeed);
+		
+
+		/*float3 dir;
 		dir.x = cos(DegToRad(yaw)) * cos(DegToRad(pitch));
 		dir.y = sin(DegToRad(pitch));
-		dir.z = sin(DegToRad(pitch)) * cos(DegToRad(pitch));
-		frustum.pos = App->model->boundingBox.CenterPoint() - App->model->boundingBox.Size().Normalize() * frustum.front;
-		frustum.front = dir.Normalized();
+		dir.z = sin(DegToRad(pitch)) * cos(DegToRad(pitch));*/
+		
 	}
 	if (App->input->GetKey(SDL_SCANCODE_F))
 	{
+		App->imgui->AddLogInput("Input: F Keyboard\n");
 		Focus();
 	}
 	return UPDATE_CONTINUE;
 }
 void ModuleCamera::ZoomIn()
 {
+	App->imgui->AddLogInput("Input: Scroll Up Mouse Wheel\n");
 	frustum.pos += speedCamera * frustum.front;
 }
 
 void ModuleCamera::ZoomOut()
 {
+	App->imgui->AddLogInput("Input: Scroll Down Mouse Wheel\n");
 	frustum.pos -= speedCamera * frustum.front;
 }
 
-void ModuleCamera::RotateCam()
-{
-	float2 move = App->input->GetMouseMotion();
-
-	move.x *= rotSpeed;
-	move.y *= rotSpeed;
-
+void ModuleCamera::RotateCam(const float xAxis, const float yAxis)
+{/*
 	yaw += move.x;
 	pitch += move.y;
 
@@ -163,38 +176,38 @@ void ModuleCamera::RotateCam()
 	dir.y = sin(DegToRad(pitch));
 	dir.z = sin(DegToRad(yaw)) * cos(DegToRad(pitch));
 
-	frustum.front = dir.Normalized();
-	//if (xAxis!= 0.0f)
-	//{
-	//	float3x3 rotY = float3x3::RotateY(xAxis);
-	//	frustum.front = rotY.Transform(frustum.front).Normalized();
-	//	frustum.up = rotY.Transform(frustum.up).Normalized();
-	//}
-	//if (yAxis != 0.0f)
-	//{
-	//	float3x3 rotX = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
-	//	frustum.up = rotX.Transform(frustum.up).Normalized();
-	//	frustum.front = rotX.Transform(frustum.front).Normalized();
-	//}
+	frustum.front = dir.Normalized();*/
+	if (xAxis!= 0.0f)
+	{
+		float3x3 rotY = float3x3::RotateY(xAxis);
+		frustum.front = rotY.Transform(frustum.front).Normalized();
+		frustum.up = rotY.Transform(frustum.up).Normalized();
+	}
+	if (yAxis != 0.0f)
+	{
+		float3x3 rotX = float3x3::RotateAxisAngle(frustum.WorldRight(), yAxis);
+		frustum.up = rotX.Transform(frustum.up).Normalized();
+		frustum.front = rotX.Transform(frustum.front).Normalized();
+	}
 }
 void ModuleCamera::OrbitCam(const float xAxis, const float yAxis)
 {
 	if (xAxis != 0.0f)
 	{
-		float3x3 rot = float3x3::RotateY(centerOffset.z * xAxis);
-		frustum.pos = rot.Transform(frustum.pos);
-		frustum.front = rot.Transform(frustum.front).Normalized();
+		float3x3 rot = float3x3::RotateY(xAxis);
+		frustum.pos = rot.Transform(frustum.pos - App->model->centerPoint) + App->model->centerPoint;
+		//frustum.front = rot.Transform(frustum.front).Normalized();
 		
 	}
 	if (yAxis != 0.0f)
 	{
-		float3x3 rot = float3x3::RotateX(centerOffset.z * yAxis);
-		frustum.pos = rot.Transform(frustum.pos);
-		frustum.front = rot.Transform(frustum.front).Normalized();
+		float3x3 rot = float3x3::RotateX(yAxis);
+		frustum.pos = rot.Transform(frustum.pos - App->model->centerPoint) + App->model->centerPoint;
+		//frustum.front = rot.Transform(frustum.front).Normalized();
 	}
-	LookAt(frustum.pos, App->model->modelPos, frustum.up);
-	proj = frustum.ProjectionMatrix();
-	view = frustum.ViewMatrix();
+	LookAt(frustum.pos, App->model->centerPoint, frustum.up);
+	/*proj = frustum.ProjectionMatrix();
+	view = frustum.ViewMatrix();*/
 }
 
 void ModuleCamera::SetFOV(float fov)
@@ -211,6 +224,9 @@ void ModuleCamera::SetAspectRatio()
 void ModuleCamera::Focus()
 {
 	frustum.pos = App->model->boundingBox.CenterPoint() - App->model->boundingBox.Size().Normalize() * frustum.front;
+	frustum.front = -float3::unitZ;
+	frustum.up = float3::unitY;
+	App->camera->view = frustum.ViewMatrix();
 }
 
 void ModuleCamera::ShowGrid()

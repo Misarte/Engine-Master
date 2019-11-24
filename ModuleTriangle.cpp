@@ -97,6 +97,7 @@ bool ModuleTriangle::Init() {
 		SetUpMesh(App->model->meshes[i]);
 	}
 	App->program->LoadShader("default.vs", "default.fs");
+	App->texture->LoadTexture("Textures/checkers.png");
 	return true;
 }
 

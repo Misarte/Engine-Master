@@ -5,6 +5,7 @@
 #include "ModuleModelLoader.h"
 #include "ModuleCamera.h"
 #include "ModuleTexture.h"
+#include "ModuleInput.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include "imgui.h"
@@ -118,6 +119,8 @@ update_status ModuleIMGUI::Update()
 			ImGui::SliderFloat("Front-Z", &(App->camera->frustum.front.z), -10.0f, 10.0f);
 			ImGui::TreePop();
 		}
+		ImGui::Text("Camera near distance: %.3f", App->camera->frustum.nearPlaneDistance);
+		ImGui::Text("Camera far distance: %.3f", App->camera->frustum.farPlaneDistance);
 		float fov = App->camera->frustum.verticalFov;
 		if (ImGui::SliderFloat("Vertical FOV", &fov, 0.01f, math::pi, "%.3f", 1.0f))
 		{
@@ -145,15 +148,17 @@ update_status ModuleIMGUI::Update()
 		{
 			ImGui::Text("Position");
 			ImGui::Text("X: %d", App->model->modelPos.x);
-			ImGui::SameLine();
 			ImGui::Text("Y: %d", App->model->modelPos.y);
-			ImGui::SameLine();
 			ImGui::Text("Z: %d", App->model->modelPos.z);
 			//ImGui::Value("X", App->model->modelPos);
-			ImGui::Text("Rotation");
+			/*ImGui::Text("Rotation");
+			ImGui::Text("X: %d", App->model->boundingBox.);
+			ImGui::SameLine();
+			ImGui::Text("Y: %d", App->model->modelPos.y);
+			ImGui::SameLine();*/
 			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().x);
-			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().y);
-			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().z);
+			ImGui::Text("Scale Y: %f", App->model->boundingBox.Size().y);
+			ImGui::Text("Scale Z: %f", App->model->boundingBox.Size().z);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Geometry"))
@@ -168,14 +173,17 @@ update_status ModuleIMGUI::Update()
 		}
 		if (ImGui::TreeNode("Texture"))
 		{
-			ImGui::Text("Width: %d", App->texture->width);
-			ImGui::Text("Height: %d", App->texture->height);
+			ImGui::Text("Current Texture Width: %d", App->texture->width);
+			ImGui::Text("Current Texture Height: %d", App->texture->height);
 			for (unsigned int i=0; i<App->texture->textures_loaded.size(); i++)
 			{
+				ImGui::Text("Width: %d", App->texture->textures_loaded[i].width);
+				ImGui::Text("Height: %d", App->texture->textures_loaded[i].height);
 				if (ImGui::ImageButton((void*)(intptr_t)App->texture->textures_loaded[i].id, ImVec2(128,128)))
 				{
 					App->model->UpdateTexture(App->texture->textures_loaded[i]);
 				}
+
 			}
 			ImGui::TreePop();
 		}
@@ -187,15 +195,11 @@ update_status ModuleIMGUI::Update()
 //	//show console window
 	if (console_window)
 	{
-		//ScrollToBottom = true;
-		//Buf  = SDL_LOG
 		ImGui::Begin("Console window", &console_window);
 		ImGui::TextUnformatted(Buf.begin());
 		if (ScrollToBottom)
 			ImGui::SetScrollHere(1.0f);
 		ScrollToBottom = false;
-		/*if (ImGui::Button("Close Me"))
-			console_window = false;*/
 		ImGui::End();
 		
 	}
@@ -207,7 +211,11 @@ update_status ModuleIMGUI::Update()
 		ImGui::Checkbox("Set Full Screen", &full_screen);
 		if (full_screen)
 		{
-			SDL_WINDOW_FULLSCREEN_DESKTOP;
+			SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		}
+		else
+		{
+			SDL_SetWindowFullscreen(App->window->window, 0);
 		}
 		if (ImGui::Button("Close Me"))
 			window_info = false;
@@ -227,37 +235,20 @@ update_status ModuleIMGUI::Update()
 	}
 	if (input_window)
 	{
-		ImGui::Begin("Inputs info", &input_window);
+		ImGui::Begin("Inputs info (Only Valid and Combos)", &input_window);
+		ImGui::TextUnformatted(BufInput.begin());
+		if (ScrollToBottom2)
+			ImGui::SetScrollHere(1.0f);
+		ScrollToBottom2 = false;
 		if (ImGui::Button("Close Me"))
-			console_window = false;
+			input_window = false;
 		ImGui::End();
 	}
-	if (texture_window)
-	{
-		ImGui::Begin("Textures info", &texture_window);
-		ImGui::Text("Textures Loaded: %d", App->texture->textures_loaded.size());
-		/*for (int i = 0; i < dirTextures.size(); i++)
-		{
-			ImGui::Checkbox("Texture:", &window_info);
-		}*/
-		
-		if (ImGui::Button("Close Me"))
-			texture_window = false;
-		ImGui::End();
-	}
+	
 	// Show config window
 	if (config_window)
 	{
 		ImGui::Begin("Configuration window", &config_window);
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::Separator();
-		fps_log.push_back(ImGui::GetIO().Framerate);
-		if (fps_log.size() > 110) {
-			char title[25];
-			sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
-			ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(350, 100));
-			fps_log.erase(fps_log.begin());
-		}
 		ImGui::Separator();
 		if (ImGui::TreeNode("Modules"))
 		{
@@ -266,7 +257,6 @@ update_status ModuleIMGUI::Update()
 			//ImGui::Checkbox("IMGUI", &imgui_window);
 			ImGui::Checkbox("Input", &input_window);
 			ImGui::Checkbox("Renderer", &renderer_window);
-			ImGui::Checkbox("Texture", &texture_window);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Libraries Configuration"))
@@ -327,10 +317,12 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("CPUs: %d logical cores", cpus);
 				int ram = SDL_GetSystemRAM();
 				ImGui::Text("RAM: %d MB", ram);
+				ImGui::Text("GPU Vendor: %s", glGetString(GL_VENDOR));
+				ImGui::Text("GPU Model: %s", glGetString(GL_RENDERER));
 				const char* platform = SDL_GetPlatform();
 				ImGui::Text("Platform: %s ", platform);
 
-				ImGui::Text("sizeof(size_t): %d, sizeof(ImDrawIdx): %d, sizeof(ImDrawVert): %d", (int)sizeof(size_t), (int)sizeof(ImDrawIdx), (int)sizeof(ImDrawVert));
+				//ImGui::Text("sizeof(size_t): %d, sizeof(ImDrawIdx): %d, sizeof(ImDrawVert): %d", (int)sizeof(size_t), (int)sizeof(ImDrawIdx), (int)sizeof(ImDrawVert));
 
 				ImGui::Text("define: __cplusplus=%d", (int)__cplusplus);
 #ifdef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
@@ -385,6 +377,10 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("define: __clang_version__=%s", __clang_version__);
 #endif
 
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::Separator();
+				
+
 				if (copy_to_clipboard)
 				{
 					ImGui::LogText("\n```\n");
@@ -403,9 +399,15 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("Description: Artemis Game Engine");
 				ImGui::Separator();
 				ImGui::Text("Author: Artemis Georgakopoulou");
-				ImGui::Separator();
 				ImGui::EndChildFrame();
 				ImGui::TreePop();
+			}
+			fps_log.push_back(ImGui::GetIO().Framerate);
+			if (fps_log.size() > 110) {
+				char title[25];
+				sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+				ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(350, 100));
+				fps_log.erase(fps_log.begin());
 			}
 		}
 		if (ImGui::Button("Close Me"))
@@ -430,6 +432,14 @@ void  ModuleIMGUI::AddLog(const char* fmt, ...)
 	Buf.appendfv(fmt, ap);
 	va_end(ap);
 	ScrollToBottom = true;
+}
+void  ModuleIMGUI::AddLogInput(const char* fmt, ...)
+{
+	static va_list  another;
+	va_start(another, fmt);
+	BufInput.appendfv(fmt, another);
+	va_end(another);
+	ScrollToBottom2 = true;
 }
 bool ModuleIMGUI::CleanUp()
 {

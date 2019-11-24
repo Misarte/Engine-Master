@@ -43,7 +43,10 @@ public:
 
 	//vector <float> logs;
 	void AddLog(const char* fmt, ...);
+	void  AddLogInput(const char* fmt, ...);
 	ImGuiTextBuffer Buf;
-	bool ScrollToBottom;
+	ImGuiTextBuffer BufInput;
+	bool ScrollToBottom; 
+	bool ScrollToBottom2;
 	bool CleanUp();
 };

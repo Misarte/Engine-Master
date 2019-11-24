@@ -96,6 +96,7 @@ update_status ModuleInput::Update()
 		{
 		case SDL_QUIT:
 			windowEvents[WE_QUIT] = true;
+			//App->imgui->AddLogInput("Input: Quit Application!\n");
 			break;
 
 		case SDL_WINDOWEVENT:
@@ -117,9 +118,11 @@ update_status ModuleInput::Update()
 				break;
 			case SDL_WINDOWEVENT_RESIZED:
 				App->window->Rescale(event.window.data1, event.window.data2);
+				//App->imgui->AddLogInput("Input: Resize window\n");
 				break;
 			case SDL_WINDOWEVENT_SIZE_CHANGED:
 				App->window->Rescale(event.window.data1, event.window.data2);
+				//App->imgui->AddLogInput("Input: Resize window\n");
 				break;
 			}
 			break;
@@ -129,15 +132,18 @@ update_status ModuleInput::Update()
 			break;
 		case SDL_MOUSEBUTTONUP:
 			mouse_buttons[event.button.button - 1] = KEY_UP;
+			//App->imgui->AddLogInput("Input: Mouse Button Down");
 			break;
 		case SDL_MOUSEWHEEL:
 			if (event.wheel.y > 0)
 			{
 				App->camera->ZoomIn();
+				//App->imgui->AddLogInput("Input: Mouse Scroll Up\n");
 			}
 			else if (event.wheel.y < 0)
 			{
 				App->camera->ZoomOut();
+				//App->imgui->AddLogInput("Input: Mouse Scroll Down\n");
 			}
 			/*mouse_buttons[event.button.button - 1] = KEY_DOWN;*/
 			break;
@@ -147,9 +153,11 @@ update_status ModuleInput::Update()
 			mouse_motion.y = event.motion.yrel / SCREEN_SIZE;
 			mouse.x = event.motion.x / SCREEN_SIZE;
 			mouse.y = event.motion.y / SCREEN_SIZE;
+			//App->imgui->AddLogInput("Input: Mouse Motion: x = %f, y = %f\n", mouse_motion.x, mouse_motion.y);
 			break;
 		case SDL_DROPFILE:
 			App->imgui->AddLog("FILE DROPPED from:%s\n", event.drop.file);
+			//App->imgui->AddLogInput("Input: Drag & Drop File\n");
 			dropped_filedir = event.drop.file;
 			if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "fbx")
 			{
@@ -182,6 +190,7 @@ update_status ModuleInput::Update()
 
 	}
 	if (GetWindowEvent(EventWindow::WE_QUIT) == true || GetKey(SDL_SCANCODE_ESCAPE) == KEY_DOWN)
+		//App->imgui->AddLogInput("Input: Quit Application!\n");
 		return UPDATE_STOP;
 
 	return UPDATE_CONTINUE;

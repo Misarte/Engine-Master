@@ -44,7 +44,7 @@ public:
 	float dz = 2.0f;
 	float3 centerOffset = {0, 0, 0};
 	float offset = 3.0f ;
-	void RotateCam();
+	void RotateCam(const float xAxis, const float yAxis);
 	void OrbitCam(const float xAxis, const float yAxis);
 	void Focus();
 	void SetFOV(float fov);
