@@ -8,6 +8,8 @@ Artemis Engine is licensed under the MIT License, see LICENSE for more informati
 
 [GitHub Link](https://github.com/Misarte/Engine-Master.git)
 
+Supported Models: BakerHouse.fbx, mechado.fbx
+
 ## Getting Started:
 
 ### Instructions:
