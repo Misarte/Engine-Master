@@ -4,7 +4,7 @@
 
 Author: Artemis Georgakopoulou
 
-Artemis Engine is licensed under the MIT License, see LICENSE for more information.
+Artemis Engine is licensed under GNU GENERAL PUBLIC LICENSE Version 3, see [LICENSE](https://github.com/Misarte/Engine-Master/blob/IMGUI/LICENSE) for more information.
 
 [GitHub Link](https://github.com/Misarte/Engine-Master.git)
 
@@ -39,6 +39,7 @@ Artemis Engine is licensed under the MIT License, see LICENSE for more informati
     - Move Camera Front/Back/Left/Right/Up/Down with W/S/A/D/Q/E Keyboard Keys correspondingly, ONLY when Right Mouse Click.
 
     - Rotate Camera 
+    
       1. Around Camera's Axis (X, Y) Move Mouse (Left/Right, Up/Down) accordingly , ONLY when Right Mouse Click.
 
       2. Around Model's Axis (X, Y) Move Mouse (Left/Right, Up/Down) accordingly, ONLY when Left Mouse Click & Left ALT Keyboard Key.
