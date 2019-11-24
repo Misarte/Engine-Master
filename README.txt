@@ -1,4 +1,4 @@
-## Artemis Engine v1
+# Artemis Engine v1
 
 3D Game Engine
 
@@ -7,24 +7,26 @@ Author: Artemis Georgakopoulou
 Artemis Engine is licensed under the MIT License, see LICENSE for more information.
 
 [GitHub Link](https://github.com/Misarte/Engine-Master.git)
-==============================================================================================================================
-## Instructions:
 
-- Load 3D Models in .fbx format.
+## Getting Started:
 
-- Load 2D Textures in .png format.
+### Instructions:
 
-- Visualize!
+1. Load 3D Models in .fbx format.
 
-- Check Model with Camera Controls.
+2. Load 2D Textures in .png format.
 
-- Modify Model with Mouse Drag&Drop other .png Texture/IMGUI Controls(Checkers.png Texture Option, LoadedTexture Option).
+3. Visualize!
 
-- Modify Window with Mouse Resize/IMGUI Window controls(Tools/Configuration Window/Modules/Window).
+4. Check Model with Camera Controls.
 
-## Controls:
+5. Modify Model with Mouse Drag&Drop other .png Texture/IMGUI Controls(Checkers.png Texture Option, LoadedTexture Option).
 
-1. Key Inputs
+6. Modify Window with Mouse Resize/IMGUI Window controls (Tools > Configuration Window > Modules > Window).
+
+### Controls:
+
+#### Key Inputs
 
   - Window Controls
 
@@ -50,7 +52,7 @@ Artemis Engine is licensed under the MIT License, see LICENSE for more informati
 
    - Drop png Texture Drag & Drop Texture within Application Window.
 
-2. IMGUI Inputs
+#### IMGUI Inputs
 - All windows contains "Close Me" Button option to close.
  
 - Main Menu
@@ -77,7 +79,7 @@ Artemis Engine is licensed under the MIT License, see LICENSE for more informati
 
      - Modules - Camera - Adjust FOV Slider.
 
-## IMGUI Info:
+### IMGUI Info:
 
 - Main Menu
 
@@ -100,3 +102,26 @@ Artemis Engine is licensed under the MIT License, see LICENSE for more informati
    - Configuration Window - Window/Camera/Input/Renderer Application information.
 
    - Configuration Window - Libraries Information.
+
+
+### Prerequisities
+
+- Install [Assimp Library](https://github.com/assimp/assimp/releases/tag/v3.3.1/)
+
+- Install [DevIL-Windows-SDK-1.8.0 Library](http://openil.sourceforge.net/download.php)
+
+- Install [glew-2.1.0-win32 Library](http://glew.sourceforge.net/)
+
+- Install [SDL2 Library](https://www.libsdl.org/download-2.0.php)
+
+- Install [SDL2_image Library](https://www.libsdl.org/projects/SDL_image/)
+
+- Install MathGeoLib Library
+
+- Install [ImGui-master Library](https://github.com/ocornut/imgui)
+
+### Build with
+
+- Windows SDK VS version 10.0.17763.0
+
+- Visual Studio 2017 v141
