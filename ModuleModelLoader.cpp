@@ -59,6 +59,8 @@ void ModuleModelLoader::LogError(const std::string& pMessage)
 void ModuleModelLoader::LoadModel(const char* path)
 {
 	meshes.clear();
+	modelPath = "Models/";
+	myTexturesPath = "Textures/";
 	// Create a logger instance 
 	DefaultLogger::create("", Logger::VERBOSE);
 	// Now I am ready for logging my stuff

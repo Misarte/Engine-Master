@@ -279,6 +279,8 @@ update_status ModuleIMGUI::Update()
 			ImGui::Text("MathGeo Library");
 			ImGui::Separator();
 			ImGui::Text("DevIl Library");
+			ImGui::Separator();
+			ImGui::Text("Assimp Library");
 			ImGui::EndChildFrame();
 			ImGui::TreePop();
 		}
@@ -292,7 +294,7 @@ update_status ModuleIMGUI::Update()
 		ImGui::Begin("About Window", &about_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 
 		//from demo
-		ImGui::Text("Artemis Enginev v1");
+		ImGui::Text("Artemis Engine v1");
 		ImGui::Separator();
 		ImGui::Text("By Artemis Georgakopoulou.");
 		ImGui::Text("Artemis Engine is licensed under the MIT License, see LICENSE for more information.");

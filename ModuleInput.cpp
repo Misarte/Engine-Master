@@ -167,6 +167,7 @@ update_status ModuleInput::Update()
 				{
 					App->triangle->SetUpMesh(App->model->meshes[i]);
 				}
+				App->texture->LoadTexture("Textures/checkers.png");
 			}
 			else if (dropped_filedir.substr(dropped_filedir.find_last_of(".") + 1) == "png")
 			{
