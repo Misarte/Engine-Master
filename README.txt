@@ -1,10 +1,4 @@
- “README.md” containing 
-info about the engine, 
-author, 
-a link to the github repository 
-and ​license ​ . 
-Any special instructions for execution should be included in this file. 
-==================================================================
+==============================================================================================================================
 Artemis Engine v1
 
 3D Game Engine
@@ -12,7 +6,7 @@ Artemis Engine v1
 Author: Artemis Georgakopoulou
 
 Artemis Engine is licensed under the MIT License, see LICENSE for more information.
-====================================================================================
+==============================================================================================================================
 Instructions:
 
 -Load 3D Models in .fbx format.
@@ -25,8 +19,9 @@ Instructions:
 
 -Modify Model with Mouse Drag&Drop other .png Texture/IMGUI Controls(Checkers.png Texture Option, LoadedTexture Option).
 -Modify Window with Mouse Resize/IMGUI Window controls(Tools/Configuration Window/Modules/Window)
-====================================================================================
------------------------------------------------Controls:-----------------------------------------------
+==============================================================================================================================
+
+-----------------------------------------------Controls:----------------------------------------------------------------------
 
 Key Inputs
 -> Window Controls
@@ -45,7 +40,7 @@ Key Inputs
 -Model Controls
 -->Drop fbx Model Drag & Drop Model within Application Window.
 -->Drop png Texture Drag & Drop Texture within Application Window.
-
+--------------------------------------------------------------------------------------------------------------------------------
 IMGUI Inputs
 ->All windows contains "Close Me" Button option to close.
  
@@ -53,11 +48,9 @@ IMGUI Inputs
 ---Visit Github Page of Application - "Visit Github page" Option.
 ---Quit Application - Hit Quit Option.
 
-
 ->Tools
 ---Properties 
 ----- Texture - Select texture for uploaded model, Checkers.png texture available.
-
 ---Configuration Window
 -----Modules - Window - Set Fullsize - Hit Checkbox.
 -----Modules - Camera - Render Grid Checkbox. 
@@ -65,16 +58,17 @@ IMGUI Inputs
 -----Modules - Camera - Adjust Position/Up-Front Vectors Sliders.
 -----Modules - Camera - Adjust FOV Slider.
 
------------------------------------------------IMGUI Info:-----------------------------------------------
+-----------------------------------------------IMGUI Info:------------------------------------------------------------------------
+
 ->Main Menu
 ---Demo Window - Shows Demo Window of IMGUI library.
 ---About Window - Show About info regarding the Application Game Engine.
 ---About Window - Show Config/Build Info Checkbox, displays System/Software Configuration settings and Frame Rate.
+
 ->Tools
 ---Console Window - Shows Application Logs
 ---Properties - Model Transformation Info
 ---Properties - Model Geometry Info
 ---Properties - Model current Texture Info
-
 ---Configuration Window - Window/Camera/Input/Renderer Application information.
 ---Configuration Window - Libraries Information.
