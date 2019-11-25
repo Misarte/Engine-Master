@@ -83,11 +83,15 @@ void ModuleModelLoader::LoadModel(const char* path)
 	}
 	directory = path;
 	processNode(scene->mRootNode, scene);
+	rotation.x = RadToDeg(rotation.x);
+	rotation.y = RadToDeg(rotation.y);
+	rotation.z = RadToDeg(rotation.z);
 	DefaultLogger::kill();
 }
 
 void ModuleModelLoader::processNode(aiNode* node, const aiScene* scene)
 {
+	node->mTransformation.Decompose(scale, rotation, position);
 	// process each mesh located at the current node
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{

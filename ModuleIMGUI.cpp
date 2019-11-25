@@ -147,18 +147,25 @@ update_status ModuleIMGUI::Update()
 		if (ImGui::TreeNode("Transformation"))
 		{
 			ImGui::Text("Position");
-			ImGui::Text("X: %d", App->model->modelPos.x);
-			ImGui::Text("Y: %d", App->model->modelPos.y);
-			ImGui::Text("Z: %d", App->model->modelPos.z);
-			//ImGui::Value("X", App->model->modelPos);
-			/*ImGui::Text("Rotation");
-			ImGui::Text("X: %d", App->model->boundingBox.);
+			ImGui::Text("X: %.2f\t", App->model->modelPos.x);
 			ImGui::SameLine();
-			ImGui::Text("Y: %d", App->model->modelPos.y);
-			ImGui::SameLine();*/
-			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().x);
-			ImGui::Text("Scale Y: %f", App->model->boundingBox.Size().y);
-			ImGui::Text("Scale Z: %f", App->model->boundingBox.Size().z);
+			ImGui::Text("Y: %.2f\t", App->model->modelPos.y);
+			ImGui::SameLine();
+			ImGui::Text("Z: %.2f\t", App->model->modelPos.z);
+			
+			ImGui::Text("Rotation");
+			ImGui::Text("X: %.2f\t", App->model->rotation.x);
+			ImGui::SameLine();
+			ImGui::Text("Y: %.2f\t", App->model->rotation.y);
+			ImGui::SameLine();
+			ImGui::Text("Z: %.2f\t", App->model->rotation.z);
+
+			ImGui::Text("Scale");
+			ImGui::Text("X: %.2f\t", App->model->scale.x);
+			ImGui::SameLine();
+			ImGui::Text("Y: %.2f\t", App->model->scale.y);
+			ImGui::SameLine();
+			ImGui::Text("Z: %.2f\t", App->model->scale.z);
 			ImGui::TreePop();
 		}
 		if (ImGui::TreeNode("Geometry"))

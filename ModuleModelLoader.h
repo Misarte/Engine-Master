@@ -38,6 +38,9 @@ public:
 	std::string finalPath = "";
 
 	
+	aiVector3D position;
+	aiQuaternion rotation;
+	aiVector3D scale;
 
 	Mesh theMesh;
 	float3 modelPos = {0, 0, 0};
