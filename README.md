@@ -10,6 +10,8 @@ Artemis Engine is licensed under GNU GENERAL PUBLIC LICENSE Version 3, see [LICE
 
 Supported Models: BakerHouse.fbx, mechado.fbx
 
+![](https://github.com/Misarte/Engine-Master/blob/master/Screenshot.jpg)
+
 ## Getting Started:
 
 ### Instructions:
