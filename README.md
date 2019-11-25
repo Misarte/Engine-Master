@@ -14,7 +14,7 @@ Supported Models: Bakerhouse.fbx, mechado.fbx
 
 ### Instructions:
 
-## .exe is in folder Game/
+#### .exe is in the folder Game/.
 
 1. Load 3D Models in .fbx format.
 
