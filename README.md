@@ -121,7 +121,7 @@ Supported Models: BakerHouse.fbx, mechado.fbx
 
 - Install [SDL2_image Library](https://www.libsdl.org/projects/SDL_image/)
 
-- Install MathGeoLib Library
+- Install [MathGeoLib Library](https://github.com/juj/MathGeoLib)
 
 - Install [ImGui-master Library](https://github.com/ocornut/imgui)
 
