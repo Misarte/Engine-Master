@@ -173,7 +173,6 @@ update_status ModuleInput::Update()
 			{
 				App->imgui->AddLog("TEXTURE DROPPED from:%s\n", event.drop.file);
 				Texture text = App->texture->LoadTexture(dropped_filedir.c_str());
-				//App->imgui->AddLog("TEXT LOADED AFTER%d\n", App->model->textures_loaded.size());
 				for (int i=0; i< App->model->meshes.size(); i++)
 				{
 					App->model->meshes[i].textures.clear();

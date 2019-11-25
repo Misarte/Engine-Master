@@ -36,11 +36,9 @@ Texture ModuleTexture::LoadTexture(const char* texture_path)
 {
 	for (unsigned int j = 0; j < textures_loaded.size(); j++)
 	{
-		if (std::strcmp(textures_loaded[j].path, texture_path) == 0)
+		if (textures_loaded[j].path.compare(std::string(texture_path)) == 0)
 		{
 			App->imgui->AddLog("Texture was loaded from fbx description path: %s\n", textures_loaded[j].path);
-			//textures_loaded.push_back(textures_loaded[j]);
-			//myTexturesPath = str.C_Str().append("Textures/");
 			return textures_loaded[j];
 		}
 	}

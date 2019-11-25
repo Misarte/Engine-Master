@@ -39,7 +39,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id;
 	char* type;
-	const char* path;
+	std::string path;
 	int width;
 	int height;
 	unsigned char* data;
