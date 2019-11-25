@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleWindow.h"
+#include "ModuleIMGUI.h"
+#include "ModuleCamera.h"
 
 ModuleWindow::ModuleWindow()
 {
@@ -14,24 +16,29 @@ ModuleWindow::~ModuleWindow()
 // Called before render is available
 bool ModuleWindow::Init()
 {
-	LOG("Init SDL window & surface");
+	App->imgui->AddLog("Init SDL window & surface\n");
 	bool ret = true;
 
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		LOG("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
+		App->imgui->AddLog("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
 	else
 	{
 		//Create window
-		int width = SCREEN_WIDTH;
-		int height = SCREEN_HEIGHT;
-		Uint32 flags = SDL_WINDOW_SHOWN |  SDL_WINDOW_OPENGL;
+		
+		flags = SDL_WINDOW_SHOWN |  SDL_WINDOW_OPENGL;
+		SDL_DisplayMode disMode;
+		SDL_GetCurrentDisplayMode(0, &disMode);
+		disScreenWidthMax = disMode.w;
+		disScreenHeightMax = disMode.w;
+		disScreenWidthMin = width =  disMode.w / aspect;
+		disScreenHeightMin = height = disMode.h / aspect;
 
 		if(FULLSCREEN == true)
 		{
-			flags |= SDL_WINDOW_FULLSCREEN;
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 		}
 		if (RESIZABLE == true)
 		{
@@ -42,7 +49,7 @@ bool ModuleWindow::Init()
 
 		if(window == NULL)
 		{
-			LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+			App->imgui->AddLog("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
 		}
 		else
@@ -56,10 +63,17 @@ bool ModuleWindow::Init()
 	return ret;
 }
 
+void ModuleWindow::Rescale(unsigned int newWidth, unsigned int newHeight)
+{
+	width = newWidth;
+	height = newHeight;
+}
+
+
 // Called before quitting
 bool ModuleWindow::CleanUp()
 {
-	LOG("Destroying SDL window and quitting all SDL systems");
+	App->imgui->AddLog("Destroying SDL window and quitting all SDL systems\n");
 
 	//Destroy window
 	if(window != NULL)

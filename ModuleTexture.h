@@ -13,8 +13,10 @@ public:
 
 	bool Init();
 
-	void LoadTexture(const char*);
-
+	Texture LoadTexture(const char*);
+	Texture texture;
+	std::vector<Texture> textures_loaded;
+	bool loaded = NULL;
 	int width, height, nrChannels;
 	ILuint imageName;
 	GLuint texture_object;

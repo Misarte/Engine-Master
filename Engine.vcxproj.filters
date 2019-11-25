@@ -126,6 +126,8 @@
       <Filter>MathGeoLib</Filter>
     </ClCompile>
     <ClCompile Include="log.cpp" />
+    <ClCompile Include="msTimer.cpp" />
+    <ClCompile Include="ModuleModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -163,6 +165,9 @@
     <ClInclude Include="Libraries\imgui-master\imstb_truetype.h">
       <Filter>IMGUI</Filter>
     </ClInclude>
+    <ClInclude Include="msTimer.h" />
+    <ClInclude Include="ModuleModelLoader.h" />
+    <ClInclude Include="..\SDL-Game2-Master\Point.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="MathGeoLib">

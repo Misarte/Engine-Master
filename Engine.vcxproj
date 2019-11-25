@@ -14,7 +14,7 @@
     <ProjectGuid>{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}</ProjectGuid>
     <RootNamespace>SDLGame</RootNamespace>
     <ProjectName>EngineMaster</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -47,13 +47,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <AdditionalIncludeDirectories>./Libraries/imgui-master;./Libraries/MathGeoLib/include;./Libraries/SDL_image/include;./Libraries/SDL/include;./Libraries/glew-2.1.0-win32/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./imgui-master;./MathGeoLib/include;./Libraries/glew-2.1.0-win32/include;./Libraries./SDL_image./include;./Libraries/SDL/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Libraries/Assimp/include;./Libraries/imgui-master;./Libraries/MathGeoLib/include;./Libraries/SDL_image/include;./Libraries/SDL/include;./Libraries/glew-2.1.0-win32/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./imgui-master;./MathGeoLib/include;./Libraries/glew-2.1.0-win32/include;./Libraries./SDL_image./include;./Libraries/SDL/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;WINDOWS_IGNORE_PACKING_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/glew-2.1.0-win32/lib/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/glew-2.1.0-win32/lib/Release/Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>./Libraries/Assimp/lib/x86;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/glew-2.1.0-win32/lib/Release/Win32;./Libraries/glew-2.1.0-win32/lib/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/glew-2.1.0-win32/lib/Release/Win32</AdditionalLibraryDirectories>
       <AdditionalDependencies>DevIL.lib
 ;ILU.lib
 ;ILUT.lib;
@@ -73,7 +73,7 @@ ole32.lib;
 oleaut32.lib;
 uuid.lib;
 odbc32.lib;
-odbccp32.lib</AdditionalDependencies>
+odbccp32.lib;assimp-vc140-mt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -84,7 +84,7 @@ odbccp32.lib</AdditionalDependencies>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <AdditionalIncludeDirectories>./Libraries/imgui-master;./Libraries/MathGeoLib/include;./Libraries/SDL_image/include;./Libraries/SDL/include;./Libraries/glew-2.1.0-win32/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./MathGeoLib/include;./glew-2.1.0-win32/glew-2.1.0/include;./SDL/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./Libraries/Assimp/include;./Libraries/imgui-master;./Libraries/MathGeoLib/include;./Libraries/SDL_image/include;./Libraries/SDL/include;./Libraries/glew-2.1.0-win32/include;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/include;./MathGeoLib/include;./glew-2.1.0-win32/glew-2.1.0/include;./SDL/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;WINDOWS_IGNORE_PACKING_MISMATCH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -92,7 +92,7 @@ odbccp32.lib</AdditionalDependencies>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/glew-2.1.0-win32/lib/Release;C:\Users\artge\Desktop\UPC\C++\Engine_Master\glew-2.1.0-win32\glew-2.1.0\lib\Release\Win32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>./Libraries/Assimp/lib/x86;./Libraries/DevIL-Windows-SDK-1.8.0/DevIL Windows SDK/lib/x86/Release;./Libraries/SDL/lib/x86;./Libraries/SDL_image/lib/x86;./Libraries/glew-2.1.0-win32/lib/Release/Win32;./Libraries/glew-2.1.0-win32/lib/Release;C:\Users\artge\Desktop\UPC\C++\Engine_Master\glew-2.1.0-win32\glew-2.1.0\lib\Release\Win32</AdditionalLibraryDirectories>
       <AdditionalDependencies>DevIL.lib
 ;ILU.lib
 ;ILUT.lib;
@@ -112,10 +112,11 @@ ole32.lib;
 oleaut32.lib;
 uuid.lib;
 odbc32.lib;
-odbccp32.lib</AdditionalDependencies>
+odbccp32.lib;assimp-vc140-mt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\SDL-Game2-Master\Point.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Libraries\imgui-master\imconfig.h" />
@@ -130,11 +131,13 @@ odbccp32.lib</AdditionalDependencies>
     <ClInclude Include="ModuleCamera.h" />
     <ClInclude Include="ModuleIMGUI.h" />
     <ClInclude Include="ModuleInput.h" />
+    <ClInclude Include="ModuleModelLoader.h" />
     <ClInclude Include="ModuleProgram.h" />
     <ClInclude Include="ModuleRender.h" />
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="ModuleTriangle.h" />
     <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="msTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -181,11 +184,13 @@ odbccp32.lib</AdditionalDependencies>
     <ClCompile Include="ModuleCamera.cpp" />
     <ClCompile Include="ModuleIMGUI.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
+    <ClCompile Include="ModuleModelLoader.cpp" />
     <ClCompile Include="ModuleProgram.cpp" />
     <ClCompile Include="ModuleRender.cpp" />
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="ModuleTriangle.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
+    <ClCompile Include="msTimer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

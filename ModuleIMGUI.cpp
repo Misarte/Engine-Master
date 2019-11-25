@@ -1,8 +1,11 @@
 #include "ModuleIMGUI.h"
-#include "ModuleCamera.h"
 #include "Application.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
+#include "ModuleModelLoader.h"
+#include "ModuleCamera.h"
+#include "ModuleTexture.h"
+#include "ModuleInput.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include "imgui.h"
@@ -10,6 +13,7 @@
 #include "imgui_impl_sdl.h"
 #include "./IL/il.h"
 #include "Globals.h"
+#include "GL/glew.h"
 
 #include <string>
 #include <iostream>
@@ -55,32 +59,43 @@ update_status ModuleIMGUI::PreUpdate()
 
 update_status ModuleIMGUI::Update()
 {
-	if (show_demo_window)
-		ImGui::ShowDemoWindow(&show_demo_window);
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("Main Menu")) 
 	{
-		static float f = 0.0f;
-		static int counter = 0;
-
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Camera constrols Window", &show_another_window);
-		ImGui::Checkbox("Console Window", &console_window);
-		ImGui::Checkbox("About Window", &about_window);
-		//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-		
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+		ImGui::MenuItem("Demo Window", NULL, &show_demo_window);
+		ImGui::MenuItem("About Window", NULL, &about_window);
+		ImGui::MenuItem("Visit Githubpage", NULL, &git);
+		ImGui::Separator();
+		ImGui::MenuItem("Quit", "Alt+F4", &quit);
+		ImGui::EndMenu();
 	}
-	// 3. Show another simple window.
+	if (ImGui::BeginMenu("Tools"))
+	{
+		//ImGui::MenuItem("Camera constrols Window", NULL, &show_another_window);
+		ImGui::MenuItem("Console Window", NULL, &console_window);
+		ImGui::MenuItem("Properties", NULL, &properties_window);
+		ImGui::MenuItem("Configurations Window", NULL, &config_window);
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
+		
+	if (quit) 
+	{
+		return UPDATE_STOP;
+	}
+	if (git)
+	{
+		ShellExecute(0, 0, "https://github.com/Misarte/Engine-Master", 0, 0, SW_SHOW);
+		git = false;
+		//return UPDATE_STOP;
+
+	}
+	if (show_demo_window)
+	{
+		ImGui::ShowDemoWindow(&show_demo_window);
+	}
+
+//Show Camera controls window.
 	if (show_another_window)
 	{
 		ImGui::Begin("Camera controls", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
@@ -88,23 +103,30 @@ update_status ModuleIMGUI::Update()
 		ImGui::Checkbox("Show Axis", &axis);
 		if (ImGui::TreeNode("Camera Position"))
 		{
-			ImGui::SliderFloat("X", &(App->camera->frustum.pos.x), -10.0f, 10.0f);
-			ImGui::SliderFloat("Y", &(App->camera->frustum.pos.y), -10.0f, 10.0f);
-			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -10.0f, 10.0f);
+			ImGui::SliderFloat("X", &(App->camera->frustum.pos.x), -50.0f, 50.0f);
+			ImGui::SliderFloat("Y", &(App->camera->frustum.pos.y), -50.0f, 50.0f);
+			ImGui::SliderFloat("Z", &(App->camera->frustum.pos.z), -50.0f, 50.0f);
 			ImGui::TreePop();
 		}
-		if (ImGui::TreeNode("Camera Rotation"))
+		if (ImGui::TreeNode("Camera Up-Front Vectors"))
 		{
 			ImGui::SliderFloat("Up-X", &(App->camera->frustum.up.x), -10.0f, 10.0f);
 			ImGui::SliderFloat("Up-Y", &(App->camera->frustum.up.y), -10.0f, 10.0f);
 			ImGui::SliderFloat("Up-Z", &(App->camera->frustum.up.z), -10.0f, 10.0f);
+
 			ImGui::SliderFloat("Front-X", &(App->camera->frustum.front.x), -10.0f, 10.0f);
 			ImGui::SliderFloat("Front-Y", &(App->camera->frustum.front.y), -10.0f, 10.0f);
 			ImGui::SliderFloat("Front-Z", &(App->camera->frustum.front.z), -10.0f, 10.0f);
 			ImGui::TreePop();
 		}
+		ImGui::Text("Camera near distance: %.3f", App->camera->frustum.nearPlaneDistance);
+		ImGui::Text("Camera far distance: %.3f", App->camera->frustum.farPlaneDistance);
+		float fov = App->camera->frustum.verticalFov;
+		if (ImGui::SliderFloat("Vertical FOV", &fov, 0.01f, math::pi, "%.3f", 1.0f))
+		{
+			App->camera->SetFOV(fov);
+		}
 		
-		ImGui::Text("Hello from another window!");
 		if (ImGui::Button("Close Me"))
 			show_another_window = false;
 		ImGui::End();
@@ -118,36 +140,161 @@ update_status ModuleIMGUI::Update()
 	{
 		App->camera->ShowAxis();
 	}
+	if (properties_window)
+	{
 
-	//show console window
+		ImGui::Begin("Properities", &properties_window);
+		if (ImGui::TreeNode("Transformation"))
+		{
+			ImGui::Text("Position");
+			ImGui::Text("X: %d", App->model->modelPos.x);
+			ImGui::Text("Y: %d", App->model->modelPos.y);
+			ImGui::Text("Z: %d", App->model->modelPos.z);
+			//ImGui::Value("X", App->model->modelPos);
+			/*ImGui::Text("Rotation");
+			ImGui::Text("X: %d", App->model->boundingBox.);
+			ImGui::SameLine();
+			ImGui::Text("Y: %d", App->model->modelPos.y);
+			ImGui::SameLine();*/
+			ImGui::Text("Scale X: %f", App->model->boundingBox.Size().x);
+			ImGui::Text("Scale Y: %f", App->model->boundingBox.Size().y);
+			ImGui::Text("Scale Z: %f", App->model->boundingBox.Size().z);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Geometry"))
+		{
+			ImGui::Text("Meshes Loaded: %d", App->model->meshes.size());
+			ImGui::Text("LoadedModel contains:");
+			ImGui::Text("Vertices: %d", App->model->numVertices);
+			ImGui::Text("Indices: %d", App->model->numIndices);
+			ImGui::Text("Faces/Triangles: %d", App->model->numFaces);
+			ImGui::Text("Center: %d", App->model->centerPoint);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Texture"))
+		{
+			ImGui::Text("Current Texture Width: %d", App->texture->width);
+			ImGui::Text("Current Texture Height: %d", App->texture->height);
+			for (unsigned int i=0; i<App->texture->textures_loaded.size(); i++)
+			{
+				ImGui::Text("Width: %d", App->texture->textures_loaded[i].width);
+				ImGui::Text("Height: %d", App->texture->textures_loaded[i].height);
+				if (ImGui::ImageButton((void*)(intptr_t)App->texture->textures_loaded[i].id, ImVec2(128,128)))
+				{
+					App->model->UpdateTexture(App->texture->textures_loaded[i]);
+				}
+
+			}
+			ImGui::TreePop();
+		}
+		
+		if (ImGui::Button("Close Me"))
+			properties_window = false;
+		ImGui::End();
+	}
+//	//show console window
 	if (console_window)
 	{
-		//ImGuiTextBuffer     Buf;
-		//ImGuiTextFilter     Filter;
-		//ImVector<int>       LineOffsets;        // Index to lines offset
-		//bool                ScrollToBottom;
-
-		////LOG(Buf);
-		//ScrollToBottom = true;
-		////Buf  = SDL_LOG
-		//ImGui::Begin("Console window", &console_window);
-		//ImGui::TextUnformatted(Buf.begin());
-		//if (ScrollToBottom)
-		//	ImGui::SetScrollHere(1.0f);
-		//ScrollToBottom = false;
-		//if (ImGui::Button("Close Me"))
-		//	console_window = false;
-		//ImGui::End();
-
-
+		ImGui::Begin("Console window", &console_window);
+		ImGui::TextUnformatted(Buf.begin());
+		if (ScrollToBottom)
+			ImGui::SetScrollHere(1.0f);
+		ScrollToBottom = false;
+		ImGui::End();
+		
 	}
-	// 3. Show about simple window.
+	if (window_info)
+	{
+		ImGui::Begin("Our window info", &window_info);
+		ImGui::Text("Window width: %d", SDL_GetWindowSurface(App->window->window)->w);
+		ImGui::Text("Window width: %d", SDL_GetWindowSurface(App->window->window)->h);
+		ImGui::Checkbox("Set Full Screen", &full_screen);
+		if (full_screen)
+		{
+			SDL_SetWindowFullscreen(App->window->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		}
+		else
+		{
+			SDL_SetWindowFullscreen(App->window->window, 0);
+		}
+		if (ImGui::Button("Close Me"))
+			window_info = false;
+		ImGui::End();
+	}
+	if (renderer_window)
+	{
+		ImGui::Begin("Renderer info", &renderer_window);
+		ImGui::Text("Using Glew %s\n", glewGetString(GLEW_VERSION));
+		ImGui::Text("Vendor: %s\n", glGetString(GL_VENDOR));
+		ImGui::Text("Renderer: %s\n", glGetString(GL_RENDERER));
+		ImGui::Text("OpenGL version supported %s\n", glGetString(GL_VERSION));
+		ImGui::Text("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+		if (ImGui::Button("Close Me"))
+			renderer_window = false;
+		ImGui::End();
+	}
+	if (input_window)
+	{
+		ImGui::Begin("Inputs info (Only Valid and Combos)", &input_window);
+		ImGui::TextUnformatted(BufInput.begin());
+		if (ScrollToBottom2)
+			ImGui::SetScrollHere(1.0f);
+		ScrollToBottom2 = false;
+		if (ImGui::Button("Close Me"))
+			input_window = false;
+		ImGui::End();
+	}
+	
+	// Show config window
+	if (config_window)
+	{
+		ImGui::Begin("Configuration window", &config_window);
+		ImGui::Separator();
+		if (ImGui::TreeNode("Modules"))
+		{
+			ImGui::Checkbox("Window", &window_info);
+			ImGui::Checkbox("Camera", &show_another_window);
+			//ImGui::Checkbox("IMGUI", &imgui_window);
+			ImGui::Checkbox("Input", &input_window);
+			ImGui::Checkbox("Renderer", &renderer_window);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Libraries Configuration"))
+		{
+			ImGui::BeginChildFrame(ImGui::GetID("libraries"), ImVec2(ImGui::GetWindowContentRegionWidth() - 45, ImGui::GetTextLineHeightWithSpacing() * 7), ImGuiWindowFlags_NoMove);
+			//ImGui::Text("IMGUI: %s", ImGui::GetVersion());
+			ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+			ImGui::Separator();
+			SDL_version compiled;
+			SDL_version linked;
+			SDL_VERSION(&compiled);
+			SDL_GetVersion(&linked);
+
+			ImGui::Text("SDL Compiled version: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
+			ImGui::Text("SDL Linked version: %d.%d.%d.\n", linked.major, linked.minor, linked.patch);
+			ImGui::Separator();
+			const char* versionGL = (char *)(glGetString(GL_VERSION));
+			ImGui::Text("Glew Version: %s", versionGL);
+			ImGui::Separator();
+			ImGui::Text("MathGeo Library");
+			ImGui::Separator();
+			ImGui::Text("DevIl Library");
+			ImGui::Separator();
+			ImGui::Text("Assimp Library");
+			ImGui::EndChildFrame();
+			ImGui::TreePop();
+		}
+		if (ImGui::Button("Close Me"))
+			config_window = false;
+		ImGui::End();
+	}
+	// Show about  window.
 	if (about_window)
 	{
 		ImGui::Begin("About Window", &about_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 
 		//from demo
-		ImGui::Text("Artemis Enginev v1");
+		ImGui::Text("Artemis Engine v1");
 		ImGui::Separator();
 		ImGui::Text("By Artemis Georgakopoulou.");
 		ImGui::Text("Artemis Engine is licensed under the MIT License, see LICENSE for more information.");
@@ -172,10 +319,12 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("CPUs: %d logical cores", cpus);
 				int ram = SDL_GetSystemRAM();
 				ImGui::Text("RAM: %d MB", ram);
+				ImGui::Text("GPU Vendor: %s", glGetString(GL_VENDOR));
+				ImGui::Text("GPU Model: %s", glGetString(GL_RENDERER));
 				const char* platform = SDL_GetPlatform();
 				ImGui::Text("Platform: %s ", platform);
 
-				ImGui::Text("sizeof(size_t): %d, sizeof(ImDrawIdx): %d, sizeof(ImDrawVert): %d", (int)sizeof(size_t), (int)sizeof(ImDrawIdx), (int)sizeof(ImDrawVert));
+				//ImGui::Text("sizeof(size_t): %d, sizeof(ImDrawIdx): %d, sizeof(ImDrawVert): %d", (int)sizeof(size_t), (int)sizeof(ImDrawIdx), (int)sizeof(ImDrawVert));
 
 				ImGui::Text("define: __cplusplus=%d", (int)__cplusplus);
 #ifdef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
@@ -230,6 +379,10 @@ update_status ModuleIMGUI::Update()
 				ImGui::Text("define: __clang_version__=%s", __clang_version__);
 #endif
 
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::Separator();
+				
+
 				if (copy_to_clipboard)
 				{
 					ImGui::LogText("\n```\n");
@@ -251,38 +404,13 @@ update_status ModuleIMGUI::Update()
 				ImGui::EndChildFrame();
 				ImGui::TreePop();
 			}
-			if (ImGui::TreeNode("Libraries Configuration"))
-			{
-				ImGui::BeginChildFrame(ImGui::GetID("libraries"), ImVec2(ImGui::GetWindowContentRegionWidth() - 45, ImGui::GetTextLineHeightWithSpacing() * 7), ImGuiWindowFlags_NoMove);
-				//ImGui::Text("IMGUI: %s", ImGui::GetVersion());
-				ImGui::Text("Dear ImGui %s (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-				ImGui::Separator();
-				SDL_version compiled;
-				SDL_version linked;
-				SDL_VERSION(&compiled);
-				SDL_GetVersion(&linked);
-
-				ImGui::Text("SDL Compiled version: %d.%d.%d\n", compiled.major, compiled.minor, compiled.patch);
-				ImGui::Text("SDL Linked version: %d.%d.%d.\n", linked.major, linked.minor, linked.patch);
-				ImGui::Separator();
-				const char* versionGL = (char *)(glGetString(GL_VERSION));
-				ImGui::Text("Glew Version: %s", versionGL);
-				/*ImGui::Separator();
-				const char* devil = (char *)(glGetString(GL_VERSION));
-				ImGui::Text("DevIL: %s", devil);*/
-				ImGui::Separator();
-				ImGui::Text("MathGeo Library");
-				/*std::string path = "/MathGeoLib/include/";
-				for (const auto & entry : fs::directory_iterator(path))
-				ImGui::Text("MathGeo File: %s");*/
-
-				ImGui::Separator();
-				//ILuint ilversion = iluGetInteger(ILU_VERSION_NUM);
-				ImGui::Text("DevIl Library");
-				ImGui::EndChildFrame();
-				ImGui::TreePop();
+			fps_log.push_back(ImGui::GetIO().Framerate);
+			if (fps_log.size() > 110) {
+				char title[25];
+				sprintf_s(title, 25, "Framerate %.1f", fps_log[fps_log.size() - 1]);
+				ImGui::PlotHistogram("##framerate", &fps_log[0], fps_log.size(), 0, title, 0.0f, 100.0f, ImVec2(350, 100));
+				fps_log.erase(fps_log.begin());
 			}
-
 		}
 		if (ImGui::Button("Close Me"))
 			about_window = false;
@@ -299,6 +427,22 @@ update_status ModuleIMGUI::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
+void  ModuleIMGUI::AddLog(const char* fmt, ...)
+{
+	static va_list  ap;
+	va_start(ap, fmt);
+	Buf.appendfv(fmt, ap);
+	va_end(ap);
+	ScrollToBottom = true;
+}
+void  ModuleIMGUI::AddLogInput(const char* fmt, ...)
+{
+	static va_list  another;
+	va_start(another, fmt);
+	BufInput.appendfv(fmt, another);
+	va_end(another);
+	ScrollToBottom2 = true;
+}
 bool ModuleIMGUI::CleanUp()
 {
 	LOG("Destroying program");

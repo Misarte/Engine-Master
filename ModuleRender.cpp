@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
+#include "ModuleIMGUI.h"
+#include "Application.h"
 #include "SDL.h"
 #include "GL/glew.h"
 
@@ -17,7 +19,7 @@ ModuleRender::~ModuleRender()
 // Called before render is available
 bool ModuleRender::Init()
 {
-	LOG("Creating Renderer context");
+	App->imgui->AddLog("Creating Renderer context\n");
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -27,11 +29,11 @@ bool ModuleRender::Init()
 
 	SDL_GL_CreateContext(App->window->window);
 	GLenum err = glewInit(); // … check for errors 
-	LOG("Using Glew %s", glewGetString(GLEW_VERSION)); // Should be 2.0
-	LOG("Vendor: %s", glGetString(GL_VENDOR));
-	LOG("Renderer: %s", glGetString(GL_RENDERER));
-	LOG("OpenGL version supported %s", glGetString(GL_VERSION));
-	LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	App->imgui->AddLog("Using Glew %s\n", glewGetString(GLEW_VERSION)); // Should be 2.0
+	App->imgui->AddLog("Vendor: %s\n", glGetString(GL_VENDOR));
+	App->imgui->AddLog("Renderer: %s\n", glGetString(GL_RENDERER));
+	App->imgui->AddLog("OpenGL version supported %s\n", glGetString(GL_VERSION));
+	App->imgui->AddLog("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glClearDepth(1.0f);
@@ -45,9 +47,9 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate()
 {
-	int width, height;
-	SDL_GetWindowSize(App->window->window, &width, &height);
-	glViewport(0, 0, width, height);
+	//int width, height;
+	SDL_GetWindowSize(App->window->window, &(App->window->width), &(App->window->height));
+	glViewport(0, 0, App->window->width, App->window->height);
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return UPDATE_CONTINUE;
@@ -69,7 +71,7 @@ update_status ModuleRender::PostUpdate()
 // Called before quitting
 bool ModuleRender::CleanUp()
 {
-	LOG("Destroying renderer");
+	App->imgui->AddLog("Destroying renderer\n");
 
 	//Destroy window
 

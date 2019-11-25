@@ -9,6 +9,8 @@ public:
 	ModuleTriangle();
 	~ModuleTriangle();
 	bool Init();
+	void DrawMesh(Mesh mesh);
+	void SetUpMesh(Mesh mesh);
 	update_status PreUpdate();
 	update_status Update();
 	update_status PostUpdate();
